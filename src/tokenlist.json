@@ -1,0 +1,43 @@
+{
+  "name": "LidexSwap Token List",
+  "logoURI": "/logo.png",
+  "keywords": ["lidexswap", "green", "bnb", "ldx"],
+  "version": { "major": 1, "minor": 0, "patch": 0 },
+  "tokens": [
+    {
+      "chainId": 56,
+      "address": "0x567A4F63f6838005e104C053fc24a3510b0432E1",
+      "name": "Lidex",
+      "symbol": "LDX",
+      "decimals": 18,
+      "logoURI": "/lidex-token-logo.png",
+      "isNative": true,
+      "isVerified": true,
+      "tags": ["native", "governance"],
+      "extensions": {
+        "bscscan": "https://bscscan.com/token/0x567A4F63f6838005e104C053fc24a3510b0432E1",
+        "supply": "500000000",
+        "holders": 4,
+        "locked": "220000000 in PinkLock V2",
+        "deployed": "2024-10-14",
+        "creator": "0x06DAe90659b2e436fddFA77C7Df27b03a514B568"
+      }
+    },
+    {
+      "chainId": 56,
+      "address": "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
+      "name": "Wrapped BNB",
+      "symbol": "WBNB",
+      "decimals": 18,
+      "logoURI": "https://tokens.pancakeswap.finance/images/0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0x55d398326f99059fF775485246999027B3197955",
+      "name": "Tether USD",
+      "symbol": "USDT",
+      "decimals": 18,
+      "logoURI": "https://tokens.pancakeswap.finance/images/0x55d398326f99059fF775485246999027B3197955.png"
+    }
+  ]
+}

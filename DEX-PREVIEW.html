@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PancakeSwap DEX - Live</title>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{font-family:'Kanit',sans-serif;box-sizing:border-box;margin:0;padding:0}
+body{background:#08060b;color:white;min-height:100vh}
+.header{height:56px;background:rgba(8,6,11,0.9);backdrop-filter:blur(20px);border-bottom:1px solid #383241;display:flex;align-items:center;justify-content:space-between;padding:0 16px;position:sticky;top:0;z-index:10}
+.logo{display:flex;align-items:center;gap:8px;font-weight:700;font-size:20px}
+.nav{display:flex;gap:8px}
+.nav a{padding:8px 12px;border-radius:12px;text-decoration:none;color:#b8add2;font-size:14px}
+.nav a.active{color:#a881fc;background:#27262c}
+.btn{border:none;cursor:pointer;font-weight:600;border-radius:16px;padding:0 16px;height:32px}
+.btn-cyan{background:#1fc7d4;color:white;box-shadow:0 0 12px rgba(31,199,212,0.4)}
+.btn-dark{background:#27262c;color:white;border:1px solid #383241}
+.main{max-width:1200px;margin:0 auto;padding:24px 16px;display:grid;grid-template-columns:1fr 420px;gap:24px}
+@media(max-width:900px){.main{grid-template-columns:1fr}.chart{order:2}.swap{order:1}}
+.card{background:#27262c;border:1px solid #383241;border-radius:24px;overflow:hidden}
+.card-header{padding:20px 20px 12px;display:flex;justify-content:space-between;align-items:center}
+.tabs{display:flex;gap:6px}
+.tab{padding:6px 14px;border-radius:999px;font-size:13px;border:none;cursor:pointer;background:transparent;color:#b8add2}
+.tab.active{background:#383241;color:white;font-weight:600}
+.swap-box{margin:0 8px;background:#1e1d2d;border-radius:16px;padding:16px;border:1px solid transparent;transition:0.2s}
+.swap-box:hover{border-color:#383241}
+.swap-label{display:flex;justify-content:space-between;font-size:12px;color:#b8add2;margin-bottom:8px}
+.swap-row{display:flex;gap:12px;align-items:center}
+.swap-input{flex:1;background:transparent;border:none;outline:none;font-size:22px;color:white;width:100%}
+.token-btn{display:flex;align-items:center;gap:6px;background:#27262c;padding:6px 10px;border-radius:999px;border:none;color:white;font-weight:600;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.2)}
+.switch-wrap{display:flex;justify-content:center;margin:-10px 0;position:relative;z-index:2}
+.switch-btn{width:40px;height:40px;border-radius:50%;background:#27262c;border:4px solid #27262c;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#a881fc}
+.details{margin:8px;background:rgba(30,29,45,0.5);border:1px solid rgba(56,50,65,0.3);border-radius:16px;padding:12px;font-size:13px}
+.detail-row{display:flex;justify-content:space-between;padding:4px 0}
+.detail-row span:first-child{color:#b8add2}
+.swap-action{padding:8px}
+.swap-action button{width:100%;height:48px;border-radius:16px;border:none;font-weight:700;font-size:16px;cursor:pointer}
+.chart{background:rgba(39,38,44,0.6);backdrop-filter:blur(10px);border:1px solid #383241;border-radius:24px;padding:20px}
+.chart-top{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px}
+.pair{display:flex;align-items:center;gap:10px}
+.pair-icons{display:flex;margin-left:4px}
+.pair-icons div{width:28px;height:28px;border-radius:50%;border:2px solid #1e1d2d;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;margin-left:-8px}
+.price{font-size:24px;font-weight:700}
+.price-up{color:#31d0aa;font-size:13px;margin-left:8px}
+.chart-area{height:260px;background:linear-gradient(180deg, rgba(168,129,252,0.15) 0%, transparent 100%);border-radius:16px;position:relative;overflow:hidden;display:flex;align-items:end;padding:0 8px}
+.bar{flex:1;background:linear-gradient(180deg, #a881fc, #1fc7d4);margin:0 1px;border-radius:2px 2px 0 0;opacity:0.8;transition:0.3s}
+.bar:hover{opacity:1}
+.stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-top:20px;padding-top:20px;border-top:1px solid rgba(56,50,65,0.5);font-size:13px}
+.stats div div:first-child{color:#b8add2;font-size:11px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);display:none;align-items:end;justify-content:center;z-index:50}
+.modal.show{display:flex}
+@media(min-width:768px){.modal{align-items:center}}
+.modal-box{background:#27262c;border:1px solid #383241;border-radius:24px 24px 0 0;width:100%;max-width:420px;max-height:80vh;display:flex;flex-direction:column}
+@media(min-width:768px){.modal-box{border-radius:24px}}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="logo"><div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#a881fc,#1fc7d4);display:flex;align-items:center;justify-content:center">🥞</div> PancakeSwap</div>
+  <div class="nav">
+    <a class="active">Trade ▾</a><a>Earn ▾</a><a>Win</a><a>NFT</a><a style="display:flex;align-items:center;gap:4px"><span style="width:6px;height:6px;background:#31d0aa;border-radius:50%;display:inline-block"></span>Blog</a>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center">
+    <div style="background:#27262c;padding:0 12px;height:32px;border-radius:16px;display:flex;align-items:center;gap:6px;font-size:13px"><img src="https://tokens.pancakeswap.finance/images/0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c.png" width="18" style="border-radius:50%"> $605.42</div>
+    <button class="btn btn-cyan" onclick="toggleWallet()" id="walletBtn">Connect Wallet</button>
+  </div>
+</div>
+
+<div class="main">
+  <div class="chart">
+    <div class="chart-top">
+      <div class="pair">
+        <div class="pair-icons"><div style="background:#F3BA2F">B</div><div style="background:#26A17B">U</div></div>
+        <div><div style="font-weight:700">BNB/USDT</div><div style="font-size:12px;color:#b8add2;display:flex;align-items:center;gap:4px"><span style="width:6px;height:6px;background:#31d0aa;border-radius:50%;display:inline-block"></span>Vol: $1.24M</div></div>
+      </div>
+      <div style="display:flex;gap:4px;background:#1e1d2d;padding:4px;border-radius:12px"><button class="tab active">24H</button><button class="tab">1W</button><button class="tab">1M</button><button class="tab">1Y</button></div>
+    </div>
+    <div><span class="price" id="chartPrice">605.4200</span><span style="color:#b8add2;margin-left:6px">USDT</span><span class="price-up">+2.34%</span></div>
+    <div class="chart-area" id="chartArea"></div>
+    <div class="stats">
+      <div><div>TVL</div><div style="font-weight:600">$1.2B</div></div>
+      <div><div>24h Volume</div><div style="font-weight:600">$89.4M</div></div>
+      <div><div>24h Fees</div><div style="font-weight:600">$223K</div></div>
+    </div>
+  </div>
+
+  <div class="swap">
+    <div class="card">
+      <div class="card-header">
+        <div class="tabs"><button class="tab active">Swap</button><button class="tab">Limit</button><button class="tab">Send</button><button class="tab">Buy <span style="background:#ffb237;color:black;font-size:8px;padding:1px 4px;border-radius:4px">NEW</span></button></div>
+        <div style="display:flex;gap:4px;color:#b8add2"><span style="cursor:pointer">⚙️</span><span style="cursor:pointer">🕒</span><span style="cursor:pointer">📊</span></div>
+      </div>
+      <div class="swap-box">
+        <div class="swap-label"><span>You pay</span><span>Balance: <span id="balFrom">2.4582</span> <span id="symFromBal">BNB</span> <a style="color:#1fc7d4;font-weight:700;cursor:pointer" onclick="setMax()">MAX</a></span></div>
+        <div class="swap-row"><input class="swap-input" id="fromAmt" placeholder="0.0" oninput="calc()"><button class="token-btn" onclick="openToken('from')"><img id="fromLogo" src="https://tokens.pancakeswap.finance/images/0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c.png" width="20" style="border-radius:50%"> <span id="fromSym">BNB</span> ▾</button></div>
+        <div style="font-size:11px;color:#b8add2;margin-top:4px">$<span id="fromUsd">0.00</span></div>
+      </div>
+      <div class="switch-wrap"><button class="switch-btn" onclick="switchT()">⇅</button></div>
+      <div class="swap-box">
+        <div class="swap-label"><span>You receive</span><span>Balance: <span id="balTo">1250.5</span> <span id="symToBal">USDT</span></span></div>
+        <div class="swap-row"><input class="swap-input" id="toAmt" placeholder="0.0" readonly><button class="token-btn" onclick="openToken('to')"><img id="toLogo" src="https://tokens.pancakeswap.finance/images/0x55d398326f99059fF775485246999027B3197955.png" width="20" style="border-radius:50%"> <span id="toSym">USDT</span> ▾</button></div>
+        <div style="font-size:11px;color:#b8add2;margin-top:4px">$<span id="toUsd">0.00</span></div>
+      </div>
+      <div class="details" id="details" style="display:none">
+        <div class="detail-row"><span>Price</span><span id="rate">1 BNB = 605.42 USDT</span></div>
+        <div class="detail-row"><span>Price Impact</span><span id="impact" style="color:#31d0aa">0.01%</span></div>
+        <div class="detail-row"><span>Minimum received</span><span id="minRec">0 USDT</span></div>
+        <div class="detail-row"><span>LP Fee</span><span>0.25%</span></div>
+        <div class="detail-row"><span>Routing</span><span style="color:#1fc7d4">BNB Smart Chain ↗</span></div>
+      </div>
+      <div class="swap-action"><button id="swapBtn" class="btn-cyan" style="background:#1fc7d4;color:white;width:100%;height:48px;border-radius:16px;font-weight:700;font-size:16px;border:none;cursor:pointer" onclick="doSwap()">Connect Wallet</button><div id="err" style="text-align:center;color:#ed4b9e;font-size:12px;margin-top:8px;display:none">Insufficient balance</div></div>
+      <div style="padding:12px 20px;border-top:1px solid rgba(56,50,65,0.3);display:flex;justify-content:space-between;font-size:11px;color:#b8add2"><span>🔗 Trade on BNB Chain</span><span>v3, v2</span></div>
+    </div>
+    <div style="margin-top:12px;background:linear-gradient(135deg,#1a1a2e,#27262c);border:1px solid #383241;border-radius:24px;padding:16px;font-size:12px">
+      <div style="font-weight:700;margin-bottom:6px">💡 What is PancakeSwap?</div>
+      <div style="color:#b8add2">PancakeSwap is a decentralized exchange (DEX) running on BNB Smart Chain. Trade tokens, add liquidity, and earn CAKE. This demo uses constant product AMM formula x*y=k with 0.25% fee.</div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="tokenModal">
+  <div class="modal-box">
+    <div style="padding:20px;display:flex;justify-content:space-between;border-bottom:1px solid #383241"><b>Select a Token</b><button onclick="closeToken()" style="background:#1e1d2d;border:none;color:white;width:28px;height:28px;border-radius:50%;cursor:pointer">✕</button></div>
+    <div style="padding:12px"><input placeholder="Search name or paste address" style="width:100%;background:#1e1d2d;border:1px solid #383241;border-radius:16px;padding:12px;color:white;outline:none"></div>
+    <div style="flex:1;overflow:auto;padding:0 8px 12px" id="tokenList"></div>
+  </div>
+</div>
+
+<div class="modal" id="txModal">
+  <div class="modal-box" style="border-radius:24px;margin:auto;max-width:360px;padding:24px;text-align:center">
+    <div id="txPending"><div style="width:64px;height:64px;border:4px solid #383241;border-top-color:#1fc7d4;border-radius:50%;margin:0 auto 16px;animation:spin 1s linear infinite"></div><b>Waiting For Confirmation</b><div style="color:#b8add2;font-size:13px;margin-top:6px">Swapping <span id="txDesc"></span></div></div>
+    <div id="txSuccess" style="display:none"><div style="width:64px;height:64px;background:rgba(49,208,170,0.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 12px">✓</div><b>Transaction Submitted</b><div style="color:#b8add2;font-size:13px;margin:8px 0">View on BscScan ↗</div></div>
+  </div>
+</div>
+
+<style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+
+<script>
+const tokens=[
+{s:'BNB',n:'BNB',p:605.42,b:2.4582,l:'https://tokens.pancakeswap.finance/images/0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c.png',c:'#F3BA2F'},
+{s:'CAKE',n:'PancakeSwap',p:2.48,b:124.82,l:'https://tokens.pancakeswap.finance/images/0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82.png',c:'#D1884F'},
+{s:'USDT',n:'Tether USD',p:1,b:1250.5,l:'https://tokens.pancakeswap.finance/images/0x55d398326f99059fF775485246999027B3197955.png',c:'#26A17B'},
+{s:'USDC',n:'USD Coin',p:1,b:892.3,l:'https://tokens.pancakeswap.finance/images/0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d.png',c:'#2775CA'},
+{s:'ETH',n:'Ethereum',p:3420,b:0.52,l:'https://tokens.pancakeswap.finance/images/0x2170Ed0880ac9A755fd29B2688956BD959F933F.png',c:'#627EEA'},
+{s:'BTCB',n:'BTCB Token',p:67245,b:0.023,l:'https://tokens.pancakeswap.finance/images/0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c.png',c:'#F7931A'},
+];
+let from=tokens[0], to=tokens[2], sel=null, connected=false;
+function renderTokens(){
+  const list=document.getElementById('tokenList');
+  list.innerHTML=tokens.map(t=>`<div onclick="pick('${t.s}')" style="display:flex;justify-content:space-between;align-items:center;padding:10px;border-radius:12px;cursor:pointer"><div style="display:flex;gap:10px;align-items:center"><img src="${t.l}" width="32" style="border-radius:50%"><div><div style="font-weight:600">${t.s}</div><div style="font-size:11px;color:#b8add2">${t.n}</div></div></div><div style="text-align:right"><div style="font-size:13px">${connected?t.b:0}</div><div style="font-size:11px;color:#b8add2">$${t.p}</div></div></div>`).join('');
+}
+function openToken(which){sel=which;document.getElementById('tokenModal').classList.add('show');renderTokens()}
+function closeToken(){document.getElementById('tokenModal').classList.remove('show')}
+function pick(sym){
+  const t=tokens.find(x=>x.s===sym);
+  if(sel==='from'){from=t;document.getElementById('fromSym').textContent=t.s;document.getElementById('fromLogo').src=t.l;document.getElementById('symFromBal').textContent=t.s;document.getElementById('balFrom').textContent=t.b}
+  else{to=t;document.getElementById('toSym').textContent=t.s;document.getElementById('toLogo').src=t.l;document.getElementById('symToBal').textContent=t.s;document.getElementById('balTo').textContent=t.b}
+  closeToken();calc();
+}
+function calc(){
+  const v=parseFloat(document.getElementById('fromAmt').value);
+  if(!v||v<=0){document.getElementById('toAmt').value='';document.getElementById('details').style.display='none';document.getElementById('fromUsd').textContent='0.00';document.getElementById('toUsd').textContent='0.00';updateBtn();return}
+  const rate=from.p/to.p;
+  const fee=0.0025;
+  const impact=Math.min(v*0.001,0.05);
+  const out=v*rate*(1-fee)*(1-impact);
+  document.getElementById('toAmt').value=out.toFixed(6);
+  document.getElementById('fromUsd').textContent=(v*from.p).toFixed(2);
+  document.getElementById('toUsd').textContent=(out*to.p).toFixed(2);
+  document.getElementById('rate').textContent=`1 ${from.s} = ${rate.toFixed(4)} ${to.s}`;
+  document.getElementById('impact').textContent=(impact*100).toFixed(2)+'%';
+  document.getElementById('impact').style.color=impact>0.01?'#ed4b9e':'#31d0aa';
+  document.getElementById('minRec').textContent=(out*0.995).toFixed(6)+' '+to.s;
+  document.getElementById('details').style.display='block';
+  document.getElementById('chartPrice').textContent=rate.toFixed(4);
+  updateBtn();
+}
+function setMax(){document.getElementById('fromAmt').value=from.b;calc()}
+function switchT(){const tmp=from;from=to;to=tmp;const a=document.getElementById('fromAmt').value;const b=document.getElementById('toAmt').value;document.getElementById('fromAmt').value=b;pick(from.s);pick(to.s);document.getElementById('fromAmt').value=b;document.getElementById('toAmt').value=a;document.getElementById('fromSym').textContent=from.s;document.getElementById('toSym').textContent=to.s;document.getElementById('fromLogo').src=from.l;document.getElementById('toLogo').src=to.l;calc()}
+function toggleWallet(){connected=!connected;document.getElementById('walletBtn').textContent=connected?'0x1a2...3F9e':'Connect Wallet';document.getElementById('walletBtn').style.background=connected?'#27262c':'';renderTokens();updateBtn()}
+function updateBtn(){
+  const btn=document.getElementById('swapBtn');
+  const v=parseFloat(document.getElementById('fromAmt').value);
+  const err=document.getElementById('err');
+  if(!connected){btn.textContent='Connect Wallet';btn.style.background='#1fc7d4';err.style.display='none';return}
+  if(!v){btn.textContent='Enter an amount';btn.style.background='#383241';err.style.display='none';return}
+  if(v>from.b){btn.textContent='Insufficient balance';btn.style.background='#383241';err.style.display='block';err.textContent=`Insufficient ${from.s} balance`;return}
+  btn.textContent='Swap';btn.style.background='#1fc7d4';err.style.display='none';
+}
+function doSwap(){
+  if(!connected){toggleWallet();return}
+  const v=document.getElementById('fromAmt').value; if(!v) return;
+  if(parseFloat(v)>from.b) return;
+  document.getElementById('txDesc').textContent=`${v} ${from.s} for ${document.getElementById('toAmt').value} ${to.s}`;
+  document.getElementById('txModal').classList.add('show');
+  document.getElementById('txPending').style.display='block';
+  document.getElementById('txSuccess').style.display='none';
+  setTimeout(()=>{document.getElementById('txPending').style.display='none';document.getElementById('txSuccess').style.display='block';setTimeout(()=>{document.getElementById('txModal').classList.remove('show');document.getElementById('fromAmt').value='';document.getElementById('toAmt').value='';calc()},2000)},2200);
+}
+document.getElementById('txModal').addEventListener('click',e=>{if(e.target.id==='txModal')e.target.classList.remove('show')});
+function buildChart(){
+  const area=document.getElementById('chartArea');
+  let h='';
+  for(let i=0;i<60;i++){const ht=40+Math.sin(i/6)*30+Math.random()*40;h+=`<div class="bar" style="height:${ht}%"></div>`}
+  area.innerHTML=h;
+}
+buildChart();
+updateBtn();
+</script>
+</body>
+</html>

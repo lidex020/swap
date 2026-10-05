@@ -338,7 +338,10 @@ export default function App() {
   const formatWalletBalance = (token) => {
     if (!connected) return null
     const balance = getBalanceForToken(token)
-    return Number(balance.value).toFixed(4)
+    const value = Number(balance.value)
+    if (!Number.isFinite(value)) return '0'
+    if (value > 0 && value < 0.000001) return '<0.000001'
+    return value.toLocaleString('en-US', { maximumFractionDigits: 6 })
   }
 
   const fromRealBalance = getBalanceForToken(fromToken)
@@ -350,7 +353,7 @@ export default function App() {
     try {
       await Promise.all([refetchBnb(), refetchErc20()])
     } catch (e) {
-      console.log('Refetch error', e)
+      console.error('Failed to refresh wallet balances', e)
     }
   }
 
@@ -633,7 +636,7 @@ export default function App() {
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-2.5">
               <img src={LIDEX_LOGO} alt="LidexSwap" className="w-9 h-9 rounded-full shadow-[0_0_15px_rgba(34,197,94,0.5)] ring-2 ring-[#22c55e]/30" />
-              <span className="font-bold text-[22px] tracking-tight hidden sm:block bg-gradient-to-r from-[#22c55e] to-[#84cc16] bg-clip-text text-transparent">LidexSwap</span>
+              <span className="font-bold text-[22px] tracking-tight hidden sm:block text-white">LidexSwap</span>
               <span className="hidden md:flex items-center gap-1 text-[10px] bg-[#1a2e1c] border border-[#22c55e]/30 text-[#22c55e] px-2 py-0.5 rounded-full"><span className="w-1.5 h-1.5 bg-[#22c55e] rounded-full animate-pulse" /> LIVE</span>
             </div>
 
@@ -736,6 +739,71 @@ export default function App() {
       </div>
 
       <main className="max-w-[1280px] mx-auto px-4 py-6 md:py-8">
+        {connected && (
+          <section aria-label="Wallet assets" className="mb-6 rounded-[24px] border border-[#1f3a22] bg-[#111a12] p-4 md:p-5">
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <Wallet size={18} className="text-[#22c55e]" />
+                <h2 className="font-bold">Wallet assets</h2>
+                <span className="text-xs text-[#8bb88f]">{walletAddress}</span>
+              </div>
+              <div className="flex items-center gap-3">
+                {chainId === BALANCE_CHAIN_ID && (
+                  <span className="text-sm font-semibold text-white">
+                    Est. total: ${totalUsdValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </span>
+                )}
+                <button
+                  type="button"
+                  onClick={() => { void refetchAll() }}
+                  aria-label="Refresh wallet balances"
+                  className="flex h-8 items-center gap-1.5 rounded-xl border border-[#1f3a22] px-2.5 text-xs text-white hover:bg-[#1a2e1c]"
+                >
+                  <RefreshCw size={13} className={balancesLoading ? 'animate-spin text-[#22c55e]' : 'text-[#22c55e]'} />
+                  Refresh
+                </button>
+              </div>
+            </div>
+            {chainId !== BALANCE_CHAIN_ID ? (
+              <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#ef4444]/30 bg-[#ef4444]/10 p-3 text-sm">
+                <span className="text-white">Switch to BNB Smart Chain to load on-chain token balances.</span>
+                <button onClick={() => switchChain({ chainId: bsc.id })} className="rounded-full bg-[#22c55e] px-3 py-1.5 text-xs font-bold text-black">
+                  Switch to BSC
+                </button>
+              </div>
+            ) : (
+              <>
+                {balancesError && (
+                  <div role="status" className="mb-3 text-xs text-[#ef4444]">
+                    Some wallet balances could not be loaded. Use Refresh to try again.
+                  </div>
+                )}
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
+                  <div className="flex min-w-0 items-center gap-2 rounded-xl border border-[#1f3a22] bg-[#0a1a0c] p-3">
+                    <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-[#22c55e]/15 text-xs font-bold text-[#22c55e]">BNB</div>
+                    <div className="min-w-0">
+                      <div className="text-xs text-[#8bb88f]">BNB</div>
+                      <div className="truncate text-sm font-semibold text-white">
+                        {bnbLoading ? 'Loading…' : bnbError ? 'Unavailable' : `${formatWalletBalance({ symbol: 'BNB' })} BNB`}
+                      </div>
+                    </div>
+                  </div>
+                  {allTokens.map(token => (
+                    <div key={token.address} className="flex min-w-0 items-center gap-2 rounded-xl border border-[#1f3a22] bg-[#0a1a0c] p-3">
+                      <TokenIcon token={token} size={32} />
+                      <div className="min-w-0">
+                        <div className="text-xs text-[#8bb88f]">{token.symbol}</div>
+                        <div className="truncate text-sm font-semibold text-white">
+                          {balancesLoading ? 'Loading…' : balancesError ? 'Unavailable' : `${formatWalletBalance(token)} ${token.symbol}`}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+          </section>
+        )}
         {view === 'swap' && (
           <div className="grid lg:grid-cols-[1fr_440px] gap-6 items-start">
             <div className="order-2 lg:order-1 space-y-4">

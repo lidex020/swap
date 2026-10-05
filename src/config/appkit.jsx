@@ -12,7 +12,7 @@ const metadata = {
   name: 'LidexSwap',
   description: 'LidexSwap - General DEX Permissionless - Trade any BEP-20 at real market prices. Green DEX with LDX token 0x567A4F63f6838005e104C053fc24a3510b0432E1 - BSC Mainnet - Reown AppKit - Secure',
   url: typeof window !== 'undefined' ? window.location.origin : 'https://lidexswap.com',
-  icons: ['/logo.png', '/lidex-token-logo.png']
+  icons: ['/logo.jpg', '/lidex-token-logo.jpg']
 }
 
 export const networks = [bsc, bscTestnet, mainnet]
@@ -29,9 +29,9 @@ export const appKit = createAppKit({
   projectId,
   metadata,
   defaultNetwork: bsc,
-  themeMode: 'dark',
+  themeMode: 'light',
   themeVariables: {
-    '--w3m-accent': '#22c55e',
+    '--w3m-accent': '#13895c',
     '--w3m-border-radius-master': '16px',
   },
   features: {

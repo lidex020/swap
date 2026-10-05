@@ -2,21 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
-* { font-family: 'Kanit', sans-serif; }
+* { font-family: 'Inter', sans-serif; }
 body {
-  background: #050a06;
-  color: white;
+  background: #f7f9f8;
+  color: #1d2922;
   margin: 0;
   overflow-x: hidden;
 }
 ::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-track { background: #050a06; }
-::-webkit-scrollbar-thumb { background: #1a2e1c; border-radius: 8px; }
-::-webkit-scrollbar-thumb:hover { background: #1f3a22; }
+::-webkit-scrollbar-track { background: #f7f9f8; }
+::-webkit-scrollbar-thumb { background: #d5e0d9; border-radius: 8px; }
+::-webkit-scrollbar-thumb:hover { background: #b9c9bf; }
 
 .pancake-gradient {
-  background: linear-gradient(180deg, #0a1a0c 0%, #050a06 100%);
+  background: linear-gradient(180deg, #ffffff 0%, #f7f9f8 100%);
 }
 .glow-green {
-  box-shadow: 0 0 20px rgba(34, 197, 94, 0.2);
+  box-shadow: 0 0 20px rgba(19, 137, 92, 0.12);
 }

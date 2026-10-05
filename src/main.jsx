@@ -22,16 +22,16 @@ class ErrorBoundary extends React.Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div style={{ background: '#050a06', color: 'white', minHeight: '100vh', padding: '20px', fontFamily: 'monospace' }}>
+        <div style={{ background: '#f7f9f8', color: '#1d2922', minHeight: '100vh', padding: '20px', fontFamily: 'monospace' }}>
           <h1 style={{ color: '#ef4444' }}>⚠️ LidexSwap - Error Detected</h1>
           <p>Secure error boundary caught an error to prevent blank screen:</p>
-          <pre style={{ background: '#111a12', padding: '12px', borderRadius: '8px', border: '1px solid #ef4444', overflow: 'auto', fontSize: '12px', whiteSpace: 'pre-wrap' }}>
+          <pre style={{ background: '#ffffff', padding: '12px', borderRadius: '8px', border: '1px solid #ef4444', overflow: 'auto', fontSize: '12px', whiteSpace: 'pre-wrap' }}>
             {this.state.error?.toString()}
             {'\n\n'}
             {this.state.error?.stack}
           </pre>
-          <button onClick={() => window.location.reload()} style={{ background: '#22c55e', color: 'black', padding: '10px 20px', borderRadius: '12px', fontWeight: 'bold', marginTop: '12px', border: 'none', cursor: 'pointer' }}>Reload Securely</button>
-          <div style={{ marginTop: '20px', fontSize: '12px', color: '#8bb88f' }}>
+          <button onClick={() => window.location.reload()} style={{ background: '#13895c', color: 'black', padding: '10px 20px', borderRadius: '12px', fontWeight: 'bold', marginTop: '12px', border: 'none', cursor: 'pointer' }}>Reload Securely</button>
+          <div style={{ marginTop: '20px', fontSize: '12px', color: '#65746b' }}>
             <div>Project ID: d7719d74fdd4d2ea309eb12d6eddb430 • BSC Mainnet • Reown AppKit</div>
           </div>
         </div>

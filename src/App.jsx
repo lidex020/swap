@@ -9,8 +9,8 @@ import { appKit } from './config/appkit.jsx'
 import { DEPLOYED_CONTRACTS } from './config/contracts.js'
 import { getSecurityScore, getPriceImpactRisk, getSlippageRisk, validateSwapAmount, OFFICIAL_LDX_ADDRESS, isOfficialLDX, sanitizeAddress } from './utils/security.js'
 
-const LIDEX_LOGO = "/logo.png"
-const LIDEX_TOKEN_LOGO = "/lidex-token-logo.png"
+const LIDEX_LOGO = "/logo.jpg"
+const LIDEX_TOKEN_LOGO = "/lidex-token-logo.jpg"
 const LIDEX_ADDRESS = OFFICIAL_LDX_ADDRESS
 const BALANCE_CHAIN_ID = bsc.id
 const ROUTER_ADDRESS = import.meta.env.VITE_LIDEX_ROUTER_ADDRESS || DEPLOYED_CONTRACTS.router
@@ -26,7 +26,7 @@ const ERC20_ABI = [
 ]
 
 const INITIAL_TOKENS = [
-  { symbol: 'LDX', name: 'Lidex', logo: LIDEX_TOKEN_LOGO, address: LIDEX_ADDRESS, price: 0, balance: 0, decimals: 18, color: '#22c55e', verified: true, officialLogo: true, coingeckoId: null, official: true },
+  { symbol: 'LDX', name: 'Lidex', logo: LIDEX_TOKEN_LOGO, address: LIDEX_ADDRESS, price: 0, balance: 0, decimals: 18, color: '#13895c', verified: true, officialLogo: true, coingeckoId: null, official: true },
   { symbol: 'WBNB', name: 'Wrapped BNB', logo: `https://tokens.pancakeswap.finance/images/${DEPLOYED_CONTRACTS.wbnb}.png`, address: DEPLOYED_CONTRACTS.wbnb, price: 716.41, balance: 0, decimals: 18, color: '#F3BA2F', verified: true, coingeckoId: 'binancecoin' },
   { symbol: 'USDT', name: 'Tether USD', logo: 'https://tokens.pancakeswap.finance/images/0x55d398326f99059fF775485246999027B3197955.png', address: '0x55d398326f99059fF775485246999027B3197955', price: 1.0, balance: 0, decimals: 18, color: '#26A17B', verified: true, coingeckoId: 'tether' },
   { symbol: 'USDC', name: 'USD Coin', logo: 'https://tokens.pancakeswap.finance/images/0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d.png', address: '0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d', price: 1.0, balance: 0, decimals: 18, color: '#2775CA', verified: true, coingeckoId: 'usd-coin' },
@@ -43,10 +43,10 @@ function TokenIcon({ token, size = 24 }) {
   const sec = getSecurityScore(token)
   return (
     <div className="relative flex-shrink-0" style={{ width: size, height: size }}>
-      <img src={token.logo} alt={token.symbol} className="w-full h-full rounded-full object-cover bg-[#0a1a0c]" onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex' }} />
-      <div style={{ display: 'none', width: size, height: size, background: token.color || '#22c55e', borderRadius: '50%' }} className="items-center justify-center text-[10px] font-bold text-white">{token.symbol?.[0] || '?'}</div>
-      {token.verified && <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-[#22c55e] rounded-full border border-[#050a06] flex items-center justify-center"><CheckCircle size={8} className="text-black" /></div>}
-      {sec.level === 'high' && !token.verified && <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-[#ef4444] rounded-full border border-[#050a06]" />}
+      <img src={token.logo} alt={token.symbol} className="w-full h-full rounded-full object-cover bg-[#f5f7f6]" onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex' }} />
+      <div style={{ display: 'none', width: size, height: size, background: token.color || '#13895c', borderRadius: '50%' }} className="items-center justify-center text-[10px] font-bold text-[#1d2922]">{token.symbol?.[0] || '?'}</div>
+      {token.verified && <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-[#13895c] rounded-full border border-[#f7f9f8] flex items-center justify-center"><CheckCircle size={8} className="text-black" /></div>}
+      {sec.level === 'high' && !token.verified && <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-[#ef4444] rounded-full border border-[#f7f9f8]" />}
     </div>
   )
 }
@@ -419,7 +419,7 @@ export default function App() {
       price: 0,
       balance: 0,
       decimals: 18,
-      color: '#22c55e',
+      color: '#13895c',
       verified: false,
       isCustom: true,
       security: getSecurityScore({ address, symbol: mockSymbol, verified: false, isCustom: true, price: 0 })
@@ -630,49 +630,49 @@ export default function App() {
   }, [fromToken.price])
 
   return (
-    <div className="min-h-screen bg-[#050a06] text-white selection:bg-[#22c55e]/30">
-      <header className="sticky top-0 z-40 backdrop-blur-xl bg-[#050a06]/90 border-b border-[#1f3a22]/50">
+    <div className="min-h-screen bg-[#f7f9f8] text-[#1d2922] selection:bg-[#13895c]/30">
+      <header className="sticky top-0 z-40 backdrop-blur-xl bg-[#f7f9f8]/90 border-b border-[#e3e9e5]/50">
         <div className="max-w-[1280px] mx-auto px-4 h-[56px] flex items-center justify-between">
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-2.5">
-              <img src={LIDEX_LOGO} alt="LidexSwap" className="w-9 h-9 rounded-full shadow-[0_0_15px_rgba(34,197,94,0.5)] ring-2 ring-[#22c55e]/30" />
-              <span className="font-bold text-[22px] tracking-tight hidden sm:block text-white">LidexSwap</span>
-              <span className="hidden md:flex items-center gap-1 text-[10px] bg-[#1a2e1c] border border-[#22c55e]/30 text-[#22c55e] px-2 py-0.5 rounded-full"><span className="w-1.5 h-1.5 bg-[#22c55e] rounded-full animate-pulse" /> LIVE</span>
+              <img src={LIDEX_LOGO} alt="LidexSwap" className="w-9 h-9 rounded-full shadow-[0_0_15px_rgba(19,137,92,0.5)] ring-2 ring-[#13895c]/30" />
+              <span className="font-bold text-[22px] tracking-tight hidden sm:block text-[#1d2922]">LidexSwap</span>
+              <span className="hidden md:flex items-center gap-1 text-[10px] bg-[#edf5f0] border border-[#13895c]/30 text-[#13895c] px-2 py-0.5 rounded-full"><span className="w-1.5 h-1.5 bg-[#13895c] rounded-full animate-pulse" /> LIVE</span>
             </div>
 
             <nav className="hidden lg:flex items-center gap-1">
               <div className="relative group">
-                <button className="px-3 py-2 rounded-xl hover:bg-[#111a12] text-[#22c55e] font-semibold text-[16px] flex items-center gap-1">Trade <ChevronDown size={16} /></button>
-                <div className="absolute top-full left-0 mt-1 w-64 bg-[#111a12] rounded-2xl border border-[#1f3a22] shadow-2xl p-2 hidden group-hover:block">
-                  <button onClick={() => setView('swap')} className={`w-full text-left px-3 py-2.5 rounded-xl hover:bg-[#1a2e1c] flex items-center gap-3 ${view === 'swap' ? 'bg-[#1a2e1c] text-white' : 'text-[#8bb88f]'}`}><ArrowDownUp size={18} /> Swap</button>
-                  <button onClick={() => setView('liquidity')} className={`w-full text-left px-3 py-2.5 rounded-xl hover:bg-[#1a2e1c] flex items-center gap-3 ${view === 'liquidity' ? 'bg-[#1a2e1c] text-white' : 'text-[#8bb88f]'}`}><Droplets size={18} /> Liquidity</button>
-                  <button onClick={() => setShowListTokenModal(true)} className="w-full text-left px-3 py-2.5 rounded-xl hover:bg-[#1a2e1c] flex items-center gap-3 text-[#8bb88f]"><Upload size={18} /> List Token</button>
-                  <div className="border-t border-[#1f3a22] my-1" />
-                  <div className="px-3 py-2 text-[11px] text-[#8bb88f]"><ShieldCheck size={12} className="inline mr-1 text-[#22c55e]" /> Security: Reown AppKit + BSC + Verified contracts</div>
+                <button className="px-3 py-2 rounded-xl hover:bg-[#ffffff] text-[#13895c] font-semibold text-[16px] flex items-center gap-1">Trade <ChevronDown size={16} /></button>
+                <div className="absolute top-full left-0 mt-1 w-64 bg-[#ffffff] rounded-2xl border border-[#e3e9e5] shadow-2xl p-2 hidden group-hover:block">
+                  <button onClick={() => setView('swap')} className={`w-full text-left px-3 py-2.5 rounded-xl hover:bg-[#edf5f0] flex items-center gap-3 ${view === 'swap' ? 'bg-[#edf5f0] text-[#1d2922]' : 'text-[#65746b]'}`}><ArrowDownUp size={18} /> Swap</button>
+                  <button onClick={() => setView('liquidity')} className={`w-full text-left px-3 py-2.5 rounded-xl hover:bg-[#edf5f0] flex items-center gap-3 ${view === 'liquidity' ? 'bg-[#edf5f0] text-[#1d2922]' : 'text-[#65746b]'}`}><Droplets size={18} /> Liquidity</button>
+                  <button onClick={() => setShowListTokenModal(true)} className="w-full text-left px-3 py-2.5 rounded-xl hover:bg-[#edf5f0] flex items-center gap-3 text-[#65746b]"><Upload size={18} /> List Token</button>
+                  <div className="border-t border-[#e3e9e5] my-1" />
+                  <div className="px-3 py-2 text-[11px] text-[#65746b]"><ShieldCheck size={12} className="inline mr-1 text-[#13895c]" /> Security: Reown AppKit + BSC + Verified contracts</div>
                 </div>
               </div>
-              <button onClick={() => setView('farms')} className="px-3 py-2 rounded-xl hover:bg-[#111a12] text-[#8bb88f] font-medium">Farms</button>
-              <button onClick={() => setShowListTokenModal(true)} className="px-3 py-2 rounded-xl bg-[#1a2e1c] border border-[#22c55e]/30 text-[#22c55e] font-medium text-sm flex items-center gap-1"><Plus size={14} /> List Token</button>
+              <button onClick={() => setView('farms')} className="px-3 py-2 rounded-xl hover:bg-[#ffffff] text-[#65746b] font-medium">Farms</button>
+              <button onClick={() => setShowListTokenModal(true)} className="px-3 py-2 rounded-xl bg-[#edf5f0] border border-[#13895c]/30 text-[#13895c] font-medium text-sm flex items-center gap-1"><Plus size={14} /> List Token</button>
             </nav>
           </div>
 
           <div className="flex items-center gap-2">
-            <div className="hidden md:flex items-center gap-2 bg-[#111a12] rounded-2xl px-3 h-8 text-sm border border-[#1f3a22]">
-              {isPriceLoading ? <RefreshCw size={14} className="animate-spin text-[#22c55e]" /> : <div className="w-2 h-2 bg-[#22c55e] rounded-full animate-pulse" />}
-              <span className="text-[#8bb88f] text-xs">{isPriceLoading ? 'Fetching...' : `Live • ${lastPriceUpdate?.toLocaleTimeString()}`}</span>
+            <div className="hidden md:flex items-center gap-2 bg-[#ffffff] rounded-2xl px-3 h-8 text-sm border border-[#e3e9e5]">
+              {isPriceLoading ? <RefreshCw size={14} className="animate-spin text-[#13895c]" /> : <div className="w-2 h-2 bg-[#13895c] rounded-full animate-pulse" />}
+              <span className="text-[#65746b] text-xs">{isPriceLoading ? 'Fetching...' : `Live • ${lastPriceUpdate?.toLocaleTimeString()}`}</span>
             </div>
 
             {connected && bnbBalance && (
-              <div className="hidden md:flex items-center gap-1.5 bg-[#1a2e1c] border border-[#22c55e]/30 rounded-2xl px-3 h-8 text-xs">
-                <span className="text-[#22c55e] font-bold">{parseFloat(bnbBalance.formatted).toFixed(4)} {bnbBalance.symbol}</span>
+              <div className="hidden md:flex items-center gap-1.5 bg-[#edf5f0] border border-[#13895c]/30 rounded-2xl px-3 h-8 text-xs">
+                <span className="text-[#13895c] font-bold">{parseFloat(bnbBalance.formatted).toFixed(4)} {bnbBalance.symbol}</span>
                 {balancesLoading && <RefreshCw size={10} className="animate-spin" />}
               </div>
             )}
-            <button onClick={() => appKit.open()} className={`h-8 px-4 rounded-2xl font-semibold text-[15px] transition-all flex items-center gap-2 ${connected ? 'bg-[#111a12] border border-[#1f3a22] text-white hover:bg-[#1a2e1c]' : 'bg-[#22c55e] text-black hover:bg-[#16a34a] shadow-[0_0_15px_rgba(34,197,94,0.5)]'}`}>
-              {connected ? <><div className="w-2 h-2 bg-[#22c55e] rounded-full animate-pulse" />{walletAddress} <span className="hidden sm:inline">• {chainId === 56 ? 'BSC' : chainId === 97 ? 'BSC Testnet' : chainId}</span></> : 'Connect Wallet'}
+            <button onClick={() => appKit.open()} className={`h-8 px-4 rounded-2xl font-semibold text-[15px] transition-all flex items-center gap-2 ${connected ? 'bg-[#ffffff] border border-[#e3e9e5] text-[#1d2922] hover:bg-[#edf5f0]' : 'bg-[#13895c] text-black hover:bg-[#0e7049] shadow-[0_0_15px_rgba(19,137,92,0.5)]'}`}>
+              {connected ? <><div className="w-2 h-2 bg-[#13895c] rounded-full animate-pulse" />{walletAddress} <span className="hidden sm:inline">• {chainId === 56 ? 'BSC' : chainId === 97 ? 'BSC Testnet' : chainId}</span></> : 'Connect Wallet'}
             </button>
             {connected && (
-              <button onClick={() => disconnect()} className="hidden md:flex w-8 h-8 rounded-full bg-[#1a1a1a] border border-[#2a2a2a] items-center justify-center text-[#8bb88f] hover:text-white" title="Disconnect securely">
+              <button onClick={() => disconnect()} className="hidden md:flex w-8 h-8 rounded-full bg-[#1a1a1a] border border-[#2a2a2a] items-center justify-center text-[#65746b] hover:text-[#1d2922]" title="Disconnect securely">
                 <X size={14} />
               </button>
             )}
@@ -681,24 +681,24 @@ export default function App() {
         </div>
 
         {mobileMenu && (
-          <div className="lg:hidden border-t border-[#1f3a22] bg-[#0a1a0c] p-4 flex flex-col gap-2">
+          <div className="lg:hidden border-t border-[#e3e9e5] bg-[#f5f7f6] p-4 flex flex-col gap-2">
             {connected && (
               <>
-                <div className="bg-[#111a12] border border-[#22c55e]/20 rounded-xl p-3">
-                  <div className="flex items-center justify-between"><div className="text-sm font-bold">{walletAddress}</div><span className="text-[10px] bg-[#22c55e] text-black px-1.5 py-0.5 rounded-full">SECURE</span></div>
-                  <div className="text-xs text-[#8bb88f] mt-1">{fullAddress}</div>
-                  <div className="text-xs text-[#22c55e] mt-1">{bnbBalance ? `${parseFloat(bnbBalance.formatted).toFixed(4)} BNB` : 'BSC'} • {chainId === 56 ? 'BSC Mainnet' : `Chain ${chainId}`} • Reown AppKit</div>
+                <div className="bg-[#ffffff] border border-[#13895c]/20 rounded-xl p-3">
+                  <div className="flex items-center justify-between"><div className="text-sm font-bold">{walletAddress}</div><span className="text-[10px] bg-[#13895c] text-black px-1.5 py-0.5 rounded-full">SECURE</span></div>
+                  <div className="text-xs text-[#65746b] mt-1">{fullAddress}</div>
+                  <div className="text-xs text-[#13895c] mt-1">{bnbBalance ? `${parseFloat(bnbBalance.formatted).toFixed(4)} BNB` : 'BSC'} • {chainId === 56 ? 'BSC Mainnet' : `Chain ${chainId}`} • Reown AppKit</div>
                 </div>
                 {chainId !== 56 && (
                   <button onClick={() => switchChain({ chainId: bsc.id })} className="text-left px-4 py-3 rounded-xl bg-[#ef4444]/20 border border-[#ef4444]/30 text-[#ef4444] text-sm">⚠️ Wrong Network - Switch to BSC Mainnet</button>
                 )}
               </>
             )}
-            <button onClick={() => { setView('swap'); setMobileMenu(false) }} className="text-left px-4 py-3 rounded-xl bg-[#111a12] border border-[#1f3a22]">Swap</button>
-            <button onClick={() => { setView('liquidity'); setMobileMenu(false) }} className="text-left px-4 py-3 rounded-xl bg-[#111a12] border border-[#1f3a22]">Liquidity</button>
-            <button onClick={() => { setShowListTokenModal(true); setMobileMenu(false) }} className="text-left px-4 py-3 rounded-xl bg-[#1a2e1c] border border-[#22c55e]/30 text-[#22c55e]">+ List Your Token</button>
+            <button onClick={() => { setView('swap'); setMobileMenu(false) }} className="text-left px-4 py-3 rounded-xl bg-[#ffffff] border border-[#e3e9e5]">Swap</button>
+            <button onClick={() => { setView('liquidity'); setMobileMenu(false) }} className="text-left px-4 py-3 rounded-xl bg-[#ffffff] border border-[#e3e9e5]">Liquidity</button>
+            <button onClick={() => { setShowListTokenModal(true); setMobileMenu(false) }} className="text-left px-4 py-3 rounded-xl bg-[#edf5f0] border border-[#13895c]/30 text-[#13895c]">+ List Your Token</button>
             {!connected ? (
-              <button onClick={() => { appKit.open(); setMobileMenu(false) }} className="text-left px-4 py-3 rounded-xl bg-[#22c55e] text-black font-bold">Connect Wallet</button>
+              <button onClick={() => { appKit.open(); setMobileMenu(false) }} className="text-left px-4 py-3 rounded-xl bg-[#13895c] text-black font-bold">Connect Wallet</button>
             ) : (
               <button onClick={() => { disconnect(); setMobileMenu(false) }} className="text-left px-4 py-3 rounded-xl bg-[#1a1a1a] border border-[#2a2a2a] text-[#ef4444]">Disconnect - Secure logout</button>
             )}
@@ -711,45 +711,45 @@ export default function App() {
         <div className="bg-[#ef4444]/10 border-b border-[#ef4444]/20 px-4 py-2 flex items-center justify-center gap-3 text-xs">
           <AlertTriangle size={14} className="text-[#ef4444]" />
           <span className="text-[#ef4444] font-bold">Security Warning: Wrong network! You are on chain {chainId}. LidexSwap requires BSC Mainnet (56) for real balances.</span>
-          <button onClick={() => switchChain({ chainId: bsc.id })} className="bg-[#ef4444] text-white px-3 py-1 rounded-full text-xs font-bold">Switch to BSC</button>
+          <button onClick={() => switchChain({ chainId: bsc.id })} className="bg-[#ef4444] text-[#1d2922] px-3 py-1 rounded-full text-xs font-bold">Switch to BSC</button>
         </div>
       )}
 
-      <div className="bg-[#0a1a0c] border-b border-[#1f3a22]/50 overflow-hidden">
+      <div className="bg-[#f5f7f6] border-b border-[#e3e9e5]/50 overflow-hidden">
         <div className="max-w-[1280px] mx-auto px-4 py-2 flex items-center gap-6 text-xs overflow-x-auto whitespace-nowrap scrollbar-hide">
-          <span className="flex items-center gap-1.5 text-[#22c55e] font-bold"><span className="w-2 h-2 bg-[#22c55e] rounded-full animate-pulse" /> ASSETS</span>
+          <span className="flex items-center gap-1.5 text-[#13895c] font-bold"><span className="w-2 h-2 bg-[#13895c] rounded-full animate-pulse" /> ASSETS</span>
           {allTokens.filter(t => t.verified).map(t => (
             <span key={t.symbol} className="flex items-center gap-1.5">
               <TokenIcon token={t} size={16} />
               <span className="font-semibold">{t.symbol}</span>
-              {connected && <span className="text-white">{formatWalletBalance(t)}</span>}
-              <span className={t.price === 0 ? 'text-[#ef4444]' : 'text-white'}>{t.price === 0 ? 'Not Listed' : `$${t.price < 1 ? t.price.toFixed(4) : t.price.toFixed(2)}`}</span>
+              {connected && <span className="text-[#1d2922]">{formatWalletBalance(t)}</span>}
+              <span className={t.price === 0 ? 'text-[#ef4444]' : 'text-[#1d2922]'}>{t.price === 0 ? 'Not Listed' : `$${t.price < 1 ? t.price.toFixed(4) : t.price.toFixed(2)}`}</span>
               {t.priceChange24h !== undefined && t.price !== 0 && (
-                <span className={`flex items-center gap-0.5 ${t.priceChange24h >= 0 ? 'text-[#22c55e]' : 'text-[#ef4444]'}`}>
+                <span className={`flex items-center gap-0.5 ${t.priceChange24h >= 0 ? 'text-[#13895c]' : 'text-[#ef4444]'}`}>
                   {t.priceChange24h >= 0 ? <TrendingUp size={10} /> : <TrendingDown size={10} />}{Math.abs(t.priceChange24h).toFixed(2)}%
                 </span>
               )}
               {t.symbol === 'LDX' && !t.listed && <span className="text-[9px] bg-[#ef4444]/20 text-[#ef4444] border border-[#ef4444]/30 px-1 rounded">NO LIQUIDITY</span>}
-              {t.symbol === 'LDX' && t.listed && <span className="text-[9px] bg-[#22c55e]/20 text-[#22c55e] border border-[#22c55e]/30 px-1 rounded">LIVE</span>}
-              {t.official && <ShieldCheck size={10} className="text-[#22c55e]" />}
+              {t.symbol === 'LDX' && t.listed && <span className="text-[9px] bg-[#13895c]/20 text-[#13895c] border border-[#13895c]/30 px-1 rounded">LIVE</span>}
+              {t.official && <ShieldCheck size={10} className="text-[#13895c]" />}
             </span>
           ))}
-          <span className="text-[#8bb88f]">{connected ? walletAddress : 'Connect Wallet'} • {customTokens.length} custom</span>
+          <span className="text-[#65746b]">{connected ? walletAddress : 'Connect Wallet'} • {customTokens.length} custom</span>
         </div>
       </div>
 
       <main className="max-w-[1280px] mx-auto px-4 py-6 md:py-8">
         {connected && (
-          <section aria-label="Wallet assets" className="mb-6 rounded-[24px] border border-[#1f3a22] bg-[#111a12] p-4 md:p-5">
+          <section aria-label="Wallet assets" className="mb-6 rounded-[24px] border border-[#e3e9e5] bg-[#ffffff] p-4 md:p-5">
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-2">
-                <Wallet size={18} className="text-[#22c55e]" />
+                <Wallet size={18} className="text-[#13895c]" />
                 <h2 className="font-bold">Wallet assets</h2>
-                <span className="text-xs text-[#8bb88f]">{walletAddress}</span>
+                <span className="text-xs text-[#65746b]">{walletAddress}</span>
               </div>
               <div className="flex items-center gap-3">
                 {chainId === BALANCE_CHAIN_ID && (
-                  <span className="text-sm font-semibold text-white">
+                  <span className="text-sm font-semibold text-[#1d2922]">
                     Est. total: ${totalUsdValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
                 )}
@@ -757,17 +757,17 @@ export default function App() {
                   type="button"
                   onClick={() => { void refetchAll() }}
                   aria-label="Refresh wallet balances"
-                  className="flex h-8 items-center gap-1.5 rounded-xl border border-[#1f3a22] px-2.5 text-xs text-white hover:bg-[#1a2e1c]"
+                  className="flex h-8 items-center gap-1.5 rounded-xl border border-[#e3e9e5] px-2.5 text-xs text-[#1d2922] hover:bg-[#edf5f0]"
                 >
-                  <RefreshCw size={13} className={balancesLoading ? 'animate-spin text-[#22c55e]' : 'text-[#22c55e]'} />
+                  <RefreshCw size={13} className={balancesLoading ? 'animate-spin text-[#13895c]' : 'text-[#13895c]'} />
                   Refresh
                 </button>
               </div>
             </div>
             {chainId !== BALANCE_CHAIN_ID ? (
               <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#ef4444]/30 bg-[#ef4444]/10 p-3 text-sm">
-                <span className="text-white">Switch to BNB Smart Chain to load on-chain token balances.</span>
-                <button onClick={() => switchChain({ chainId: bsc.id })} className="rounded-full bg-[#22c55e] px-3 py-1.5 text-xs font-bold text-black">
+                <span className="text-[#1d2922]">Switch to BNB Smart Chain to load on-chain token balances.</span>
+                <button onClick={() => switchChain({ chainId: bsc.id })} className="rounded-full bg-[#13895c] px-3 py-1.5 text-xs font-bold text-black">
                   Switch to BSC
                 </button>
               </div>
@@ -779,21 +779,21 @@ export default function App() {
                   </div>
                 )}
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
-                  <div className="flex min-w-0 items-center gap-2 rounded-xl border border-[#1f3a22] bg-[#0a1a0c] p-3">
-                    <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-[#22c55e]/15 text-xs font-bold text-[#22c55e]">BNB</div>
+                  <div className="flex min-w-0 items-center gap-2 rounded-xl border border-[#e3e9e5] bg-[#f5f7f6] p-3">
+                    <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-[#13895c]/15 text-xs font-bold text-[#13895c]">BNB</div>
                     <div className="min-w-0">
-                      <div className="text-xs text-[#8bb88f]">BNB</div>
-                      <div className="truncate text-sm font-semibold text-white">
+                      <div className="text-xs text-[#65746b]">BNB</div>
+                      <div className="truncate text-sm font-semibold text-[#1d2922]">
                         {bnbLoading ? 'Loading…' : bnbError ? 'Unavailable' : `${formatWalletBalance({ symbol: 'BNB' })} BNB`}
                       </div>
                     </div>
                   </div>
                   {allTokens.map(token => (
-                    <div key={token.address} className="flex min-w-0 items-center gap-2 rounded-xl border border-[#1f3a22] bg-[#0a1a0c] p-3">
+                    <div key={token.address} className="flex min-w-0 items-center gap-2 rounded-xl border border-[#e3e9e5] bg-[#f5f7f6] p-3">
                       <TokenIcon token={token} size={32} />
                       <div className="min-w-0">
-                        <div className="text-xs text-[#8bb88f]">{token.symbol}</div>
-                        <div className="truncate text-sm font-semibold text-white">
+                        <div className="text-xs text-[#65746b]">{token.symbol}</div>
+                        <div className="truncate text-sm font-semibold text-[#1d2922]">
                           {balancesLoading ? 'Loading…' : balancesError ? 'Unavailable' : `${formatWalletBalance(token)} ${token.symbol}`}
                         </div>
                       </div>
@@ -807,37 +807,37 @@ export default function App() {
         {view === 'swap' && (
           <div className="grid lg:grid-cols-[1fr_440px] gap-6 items-start">
             <div className="order-2 lg:order-1 space-y-4">
-              <div className="bg-[#111a12]/70 backdrop-blur rounded-[24px] border border-[#1f3a22] p-4 md:p-6 shadow-[0_0_30px_rgba(34,197,94,0.08)]\">
+              <div className="bg-[#ffffff]/70 backdrop-blur rounded-[24px] border border-[#e3e9e5] p-4 md:p-6 shadow-[0_0_30px_rgba(19,137,92,0.08)]\">
                 <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
                   <div className="flex items-center gap-3">
                     <div className="flex items-center -space-x-2">
-                      <div className="w-8 h-8 rounded-full bg-[#111a12] border-2 border-[#0a1a0c] flex items-center justify-center"><TokenIcon token={fromToken} size={20} /></div>
-                      <div className="w-8 h-8 rounded-full bg-[#111a12] border-2 border-[#0a1a0c] flex items-center justify-center"><TokenIcon token={toToken} size={20} /></div>
+                      <div className="w-8 h-8 rounded-full bg-[#ffffff] border-2 border-[#f5f7f6] flex items-center justify-center"><TokenIcon token={fromToken} size={20} /></div>
+                      <div className="w-8 h-8 rounded-full bg-[#ffffff] border-2 border-[#f5f7f6] flex items-center justify-center"><TokenIcon token={toToken} size={20} /></div>
                     </div>
                     <div>
                       <div className="font-bold text-lg flex items-center gap-2">
                         {fromToken.symbol}/{toToken.symbol}
-                        {fromToken.price === 0 || toToken.price === 0 ? <span className="text-[10px] bg-[#ef4444]/20 text-[#ef4444] border border-[#ef4444]/30 px-1.5 py-0.5 rounded-full">NO PRICE</span> : <span className="text-[10px] bg-[#22c55e]/20 text-[#22c55e] border border-[#22c55e]/30 px-1.5 py-0.5 rounded-full">LIVE</span>}
-                        <span className="text-[10px] bg-[#1a2e1c] border border-[#22c55e]/20 text-[#22c55e] px-1.5 py-0.5 rounded-full flex items-center gap-1"><Shield size={10} /> SECURE</span>
+                        {fromToken.price === 0 || toToken.price === 0 ? <span className="text-[10px] bg-[#ef4444]/20 text-[#ef4444] border border-[#ef4444]/30 px-1.5 py-0.5 rounded-full">NO PRICE</span> : <span className="text-[10px] bg-[#13895c]/20 text-[#13895c] border border-[#13895c]/30 px-1.5 py-0.5 rounded-full">LIVE</span>}
+                        <span className="text-[10px] bg-[#edf5f0] border border-[#13895c]/20 text-[#13895c] px-1.5 py-0.5 rounded-full flex items-center gap-1"><Shield size={10} /> SECURE</span>
                       </div>
-                      <div className="text-sm text-[#8bb88f] flex items-center gap-2">
-                        <span className="w-2 h-2 bg-[#22c55e] rounded-full animate-pulse" />
+                      <div className="text-sm text-[#65746b] flex items-center gap-2">
+                        <span className="w-2 h-2 bg-[#13895c] rounded-full animate-pulse" />
                         {fromToken.price === 0 ? `${fromToken.symbol} not listed` : `Real: $${fromToken.price.toFixed(4)} / $${toToken.price.toFixed(4)}`} • Verified
                       </div>
                     </div>
                   </div>
-                  <div className="flex gap-1 bg-[#0a1a0c] rounded-xl p-1 border border-[#1f3a22]">
+                  <div className="flex gap-1 bg-[#f5f7f6] rounded-xl p-1 border border-[#e3e9e5]">
                     {['24H', '1W', '1M', '1Y'].map(t => (
-                      <button key={t} className={`px-3 py-1 rounded-lg text-sm font-medium ${t === '24H' ? 'bg-[#1a2e1c] text-white border border-[#22c55e]/30' : 'text-[#8bb88f]'}`}>{t}</button>
+                      <button key={t} className={`px-3 py-1 rounded-lg text-sm font-medium ${t === '24H' ? 'bg-[#edf5f0] text-[#1d2922] border border-[#13895c]/30' : 'text-[#65746b]'}`}>{t}</button>
                     ))}
                   </div>
                 </div>
 
                 <div className="flex items-baseline gap-3 mb-2">
                   <span className="text-2xl font-bold">{fromToken.price === 0 || toToken.price === 0 ? 'No Price' : (fromToken.price / toToken.price).toFixed(6)}</span>
-                  <span className="text-[#8bb88f]">{fromToken.price === 0 || toToken.price === 0 ? '' : toToken.symbol}</span>
+                  <span className="text-[#65746b]">{fromToken.price === 0 || toToken.price === 0 ? '' : toToken.symbol}</span>
                   {fromToken.priceChange24h !== undefined && fromToken.price !== 0 && (
-                    <span className={`text-sm font-medium flex items-center gap-1 ${fromToken.priceChange24h >= 0 ? 'text-[#22c55e]' : 'text-[#ef4444]'}`}>
+                    <span className={`text-sm font-medium flex items-center gap-1 ${fromToken.priceChange24h >= 0 ? 'text-[#13895c]' : 'text-[#ef4444]'}`}>
                       {fromToken.priceChange24h >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}{fromToken.priceChange24h?.toFixed(2)}% (24h)
                     </span>
                   )}
@@ -848,61 +848,61 @@ export default function App() {
                     <AreaChart data={chartDataDynamic}>
                       <defs>
                         <linearGradient id="priceGrad" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#22c55e" stopOpacity={0.4} />
-                          <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
+                          <stop offset="5%" stopColor="#13895c" stopOpacity={0.4} />
+                          <stop offset="95%" stopColor="#13895c" stopOpacity={0} />
                         </linearGradient>
                       </defs>
                       <XAxis dataKey="time" hide />
                       <YAxis domain={['auto', 'auto']} hide />
-                      <Tooltip contentStyle={{ background: '#111a12', border: '1px solid #1f3a22', borderRadius: '12px', color: 'white' }} formatter={(v) => [`$${Number(v).toFixed(6)}`, 'Real Price']} />
-                      <Area type="monotone" dataKey="price" stroke={fromToken.price === 0 ? '#ef4444' : '#22c55e'} strokeWidth={2.5} fill="url(#priceGrad)" />
+                      <Tooltip contentStyle={{ background: '#ffffff', border: '1px solid #e3e9e5', borderRadius: '12px', color: 'white' }} formatter={(v) => [`$${Number(v).toFixed(6)}`, 'Real Price']} />
+                      <Area type="monotone" dataKey="price" stroke={fromToken.price === 0 ? '#ef4444' : '#13895c'} strokeWidth={2.5} fill="url(#priceGrad)" />
                     </AreaChart>
                   </ResponsiveContainer>
                 </div>
 
-                <div className="grid grid-cols-3 gap-4 mt-6 pt-6 border-t border-[#1f3a22]/50">
-                  <div><div className="text-xs text-[#8bb88f] flex items-center gap-1"><Shield size={10} /> Security</div><div className="font-semibold text-xs flex items-center gap-1">{fromSecurity.level === 'safe' ? <ShieldCheck size={12} className="text-[#22c55e]" /> : <AlertTriangle size={12} className="text-[#eab308]" />}{fromSecurity.score}/100 {fromSecurity.level}</div><div className="text-[11px] text-[#22c55e]">{fromSecurity.positives[0] || 'Checked'}</div></div>
-                  <div><div className="text-xs text-[#8bb88f]">24h Volume</div><div className="font-semibold">{fromToken.symbol === 'LDX' ? (ldxRealData.listed ? `$${ldxRealData.volume24h?.toFixed(0)}` : '$0') : 'Live'}</div></div>
-                  <div><div className="text-xs text-[#8bb88f]">Market Cap</div><div className="font-semibold">{fromToken.symbol === 'LDX' ? (ldxRealData.listed ? `$${(ldxRealData.marketCap/1000000).toFixed(2)}M` : '$0') : 'Live'}</div></div>
+                <div className="grid grid-cols-3 gap-4 mt-6 pt-6 border-t border-[#e3e9e5]/50">
+                  <div><div className="text-xs text-[#65746b] flex items-center gap-1"><Shield size={10} /> Security</div><div className="font-semibold text-xs flex items-center gap-1">{fromSecurity.level === 'safe' ? <ShieldCheck size={12} className="text-[#13895c]" /> : <AlertTriangle size={12} className="text-[#eab308]" />}{fromSecurity.score}/100 {fromSecurity.level}</div><div className="text-[11px] text-[#13895c]">{fromSecurity.positives[0] || 'Checked'}</div></div>
+                  <div><div className="text-xs text-[#65746b]">24h Volume</div><div className="font-semibold">{fromToken.symbol === 'LDX' ? (ldxRealData.listed ? `$${ldxRealData.volume24h?.toFixed(0)}` : '$0') : 'Live'}</div></div>
+                  <div><div className="text-xs text-[#65746b]">Market Cap</div><div className="font-semibold">{fromToken.symbol === 'LDX' ? (ldxRealData.listed ? `$${(ldxRealData.marketCap/1000000).toFixed(2)}M` : '$0') : 'Live'}</div></div>
                 </div>
               </div>
             </div>
 
             <div className="order-1 lg:order-2">
-              <div className="bg-[#111a12] rounded-[24px] border border-[#1f3a22] shadow-[0_0_40px_rgba(34,197,94,0.15)] overflow-hidden">
+              <div className="bg-[#ffffff] rounded-[24px] border border-[#e3e9e5] shadow-[0_0_40px_rgba(19,137,92,0.15)] overflow-hidden">
                 <div className="flex items-center justify-between p-5 pb-3">
                   <div className="flex gap-2">
-                    <button className="px-4 py-2 rounded-full bg-[#1a2e1c] text-white font-semibold text-sm border border-[#22c55e]/30">Swap</button>
-                    <button className="px-3 py-2 rounded-full bg-[#1a2e1c] border border-[#22c55e]/20 text-[#22c55e] text-xs flex items-center gap-1"><Shield size={12} /> Secure</button>
+                    <button className="px-4 py-2 rounded-full bg-[#edf5f0] text-[#1d2922] font-semibold text-sm border border-[#13895c]/30">Swap</button>
+                    <button className="px-3 py-2 rounded-full bg-[#edf5f0] border border-[#13895c]/20 text-[#13895c] text-xs flex items-center gap-1"><Shield size={12} /> Secure</button>
                   </div>
                   <div className="flex items-center gap-1">
-                    {connected && <span className="text-[10px] bg-[#1a2e1c] border border-[#22c55e]/20 text-[#22c55e] px-2 py-1 rounded-full hidden md:flex items-center gap-1"><ShieldCheck size={10} />{chainId === 56 ? 'BSC Secure' : `Chain ${chainId}`}</span>}
-                    <button onClick={() => setShowSecurityInfo(!showSecurityInfo)} className="w-8 h-8 rounded-full bg-[#1a2e1c] border border-[#22c55e]/20 flex items-center justify-center text-[#22c55e]"><Shield size={16} /></button>
-                    <button onClick={() => setShowSettings(!showSettings)} className="w-8 h-8 rounded-full hover:bg-[#1a2e1c] flex items-center justify-center text-[#8bb88f]"><Settings size={18} /></button>
+                    {connected && <span className="text-[10px] bg-[#edf5f0] border border-[#13895c]/20 text-[#13895c] px-2 py-1 rounded-full hidden md:flex items-center gap-1"><ShieldCheck size={10} />{chainId === 56 ? 'BSC Secure' : `Chain ${chainId}`}</span>}
+                    <button onClick={() => setShowSecurityInfo(!showSecurityInfo)} className="w-8 h-8 rounded-full bg-[#edf5f0] border border-[#13895c]/20 flex items-center justify-center text-[#13895c]"><Shield size={16} /></button>
+                    <button onClick={() => setShowSettings(!showSettings)} className="w-8 h-8 rounded-full hover:bg-[#edf5f0] flex items-center justify-center text-[#65746b]"><Settings size={18} /></button>
                   </div>
                 </div>
 
                 {showSecurityInfo && (
-                  <div className="mx-2 mb-2 bg-[#0a1a0c] border border-[#22c55e]/20 rounded-2xl p-3 text-[11px]">
-                    <div className="font-bold text-[#22c55e] flex items-center gap-1"><ShieldCheck size={12} /> Security Center - LidexSwap</div>
-                    <div className="mt-2 space-y-1 text-[#8bb88f]">
-                      <div className="flex justify-between"><span>Connection</span><span className="text-[#22c55e]">Encrypted • Reown AppKit • Non-custodial</span></div>
-                      <div className="flex justify-between"><span>Official LDX</span><span className="text-white font-mono">{LIDEX_ADDRESS.slice(0,10)}...{LIDEX_ADDRESS.slice(-8)} <ShieldCheck size={10} className="inline text-[#22c55e]" /></span></div>
-                      <div className="flex justify-between"><span>Chain</span><span className={chainId === 56 ? 'text-[#22c55e]' : 'text-[#ef4444]'}>{chainId === 56 ? 'BSC Mainnet - Secure' : `Wrong chain ${chainId} - Risk!`}</span></div>
-                      <div className="flex justify-between"><span>Slippage</span><span style={{ color: slippageRisk.level === 'safe' ? '#22c55e' : '#eab308' }}>{slippage}% - {slippageRisk.text}</span></div>
+                  <div className="mx-2 mb-2 bg-[#f5f7f6] border border-[#13895c]/20 rounded-2xl p-3 text-[11px]">
+                    <div className="font-bold text-[#13895c] flex items-center gap-1"><ShieldCheck size={12} /> Security Center - LidexSwap</div>
+                    <div className="mt-2 space-y-1 text-[#65746b]">
+                      <div className="flex justify-between"><span>Connection</span><span className="text-[#13895c]">Encrypted • Reown AppKit • Non-custodial</span></div>
+                      <div className="flex justify-between"><span>Official LDX</span><span className="text-[#1d2922] font-mono">{LIDEX_ADDRESS.slice(0,10)}...{LIDEX_ADDRESS.slice(-8)} <ShieldCheck size={10} className="inline text-[#13895c]" /></span></div>
+                      <div className="flex justify-between"><span>Chain</span><span className={chainId === 56 ? 'text-[#13895c]' : 'text-[#ef4444]'}>{chainId === 56 ? 'BSC Mainnet - Secure' : `Wrong chain ${chainId} - Risk!`}</span></div>
+                      <div className="flex justify-between"><span>Slippage</span><span style={{ color: slippageRisk.level === 'safe' ? '#13895c' : '#eab308' }}>{slippage}% - {slippageRisk.text}</span></div>
                       <div className="flex justify-between"><span>Price Impact</span><span style={{ color: priceImpactRisk.color }}>{priceImpact.toFixed(2)}% - {priceImpactRisk.text}</span></div>
-                      <div className="text-[10px] mt-2 p-2 bg-[#111a12] rounded-lg border border-[#1f3a22]">Always verify official LDX address on BscScan. Never share seed phrase. LidexSwap never asks for private keys. All swaps are non-custodial.</div>
+                      <div className="text-[10px] mt-2 p-2 bg-[#ffffff] rounded-lg border border-[#e3e9e5]">Always verify official LDX address on BscScan. Never share seed phrase. LidexSwap never asks for private keys. All swaps are non-custodial.</div>
                     </div>
                   </div>
                 )}
 
                 {connected && address && (
-                  <div className="mx-2 mb-2 bg-[#0a1a0c] border border-[#22c55e]/20 rounded-2xl p-2.5 flex items-center justify-between">
+                  <div className="mx-2 mb-2 bg-[#f5f7f6] border border-[#13895c]/20 rounded-2xl p-2.5 flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <div className="w-7 h-7 rounded-full bg-[#22c55e]/20 border border-[#22c55e]/30 flex items-center justify-center"><Wallet size={12} className="text-[#22c55e]" /></div>
-                      <div className="text-xs font-bold text-white flex items-center gap-1.5">{walletAddress} <span className="text-[9px] bg-[#22c55e] text-black px-1.5 py-0.5 rounded-full flex items-center gap-1"><ShieldCheck size={8} /> Secure</span><span className="text-[10px] text-[#8bb88f] font-normal">{chainId === 56 ? 'BSC' : `Chain ${chainId}`}</span></div>
+                      <div className="w-7 h-7 rounded-full bg-[#13895c]/20 border border-[#13895c]/30 flex items-center justify-center"><Wallet size={12} className="text-[#13895c]" /></div>
+                      <div className="text-xs font-bold text-[#1d2922] flex items-center gap-1.5">{walletAddress} <span className="text-[9px] bg-[#13895c] text-black px-1.5 py-0.5 rounded-full flex items-center gap-1"><ShieldCheck size={8} /> Secure</span><span className="text-[10px] text-[#65746b] font-normal">{chainId === 56 ? 'BSC' : `Chain ${chainId}`}</span></div>
                     </div>
-                    <button onClick={() => appKit.open()} className="text-[11px] bg-[#111a12] border border-[#1f3a22] hover:bg-[#1a2e1c] text-[#8bb88f] hover:text-white px-3 py-1 rounded-full">Manage</button>
+                    <button onClick={() => appKit.open()} className="text-[11px] bg-[#ffffff] border border-[#e3e9e5] hover:bg-[#edf5f0] text-[#65746b] hover:text-[#1d2922] px-3 py-1 rounded-full">Manage</button>
                   </div>
                 )}
 
@@ -914,58 +914,58 @@ export default function App() {
                 )}
 
                 <div className="p-2 space-y-1">
-                  <div className="bg-[#0a1a0c] rounded-2xl p-4 border border-transparent hover:border-[#1f3a22] transition-colors">
-                    <div className="flex justify-between text-xs text-[#8bb88f] mb-2">
-                      <span className="flex items-center gap-1">You pay <Shield size={10} className="text-[#22c55e]" /></span>
+                  <div className="bg-[#f5f7f6] rounded-2xl p-4 border border-transparent hover:border-[#e3e9e5] transition-colors">
+                    <div className="flex justify-between text-xs text-[#65746b] mb-2">
+                      <span className="flex items-center gap-1">You pay <Shield size={10} className="text-[#13895c]" /></span>
                       <span className="flex items-center gap-1">
                         {connected ? (
                           <>
-                            <span className={fromRealBalance.isReal ? 'text-[#22c55e]' : 'text-[#8bb88f]'}>Real: {fromRealBalance.isReal ? parseFloat(fromRealBalance.formatted).toFixed(4) : '0.0000'} {fromToken.symbol}</span>
-                            <button onClick={() => setFromAmount(fromRealBalance.value.toString())} className="ml-1 bg-[#1a2e1c] border border-[#22c55e]/30 text-[#22c55e] px-1.5 py-0.5 rounded-full text-[10px]">MAX</button>
+                            <span className={fromRealBalance.isReal ? 'text-[#13895c]' : 'text-[#65746b]'}>Real: {fromRealBalance.isReal ? parseFloat(fromRealBalance.formatted).toFixed(4) : '0.0000'} {fromToken.symbol}</span>
+                            <button onClick={() => setFromAmount(fromRealBalance.value.toString())} className="ml-1 bg-[#edf5f0] border border-[#13895c]/30 text-[#13895c] px-1.5 py-0.5 rounded-full text-[10px]">MAX</button>
                           </>
                         ) : '0.0'} {fromToken.symbol}
                       </span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <input value={fromAmount} onChange={e => setFromAmount(e.target.value.replace(/[^0-9.]/g, ''))} placeholder="0.0" className="flex-1 bg-transparent text-[24px] font-medium outline-none placeholder:text-[#8bb88f]/50" />
-                      <button onClick={() => setShowTokenSelect('from')} className="flex items-center gap-2 bg-[#111a12] hover:bg-[#1a2e1c] rounded-full px-3 py-1.5 font-semibold shadow border border-[#1f3a22]">
+                      <input value={fromAmount} onChange={e => setFromAmount(e.target.value.replace(/[^0-9.]/g, ''))} placeholder="0.0" className="flex-1 bg-transparent text-[24px] font-medium outline-none placeholder:text-[#65746b]/50" />
+                      <button onClick={() => setShowTokenSelect('from')} className="flex items-center gap-2 bg-[#ffffff] hover:bg-[#edf5f0] rounded-full px-3 py-1.5 font-semibold shadow border border-[#e3e9e5]">
                         <TokenIcon token={fromToken} size={24} />{fromToken.symbol}<ChevronDown size={16} />
                       </button>
                     </div>
-                    <div className="text-xs text-[#8bb88f] mt-1 flex items-center gap-1 justify-between">
+                    <div className="text-xs text-[#65746b] mt-1 flex items-center gap-1 justify-between">
                       <span>${fromAmount && fromToken.price !== 0 ? (parseFloat(fromAmount) * fromToken.price).toFixed(2) : '0.00'} {fromToken.price !== 0 ? `• Real: $${fromToken.price.toFixed(4)}` : '• No price'} • Sec: {fromSecurity.score}/100</span>
                       {fromSecurity.level !== 'safe' && <span className="text-[#eab308] flex items-center gap-1"><AlertTriangle size={10} /> {fromSecurity.risks[0]}</span>}
                     </div>
                   </div>
 
                   <div className="flex justify-center -my-3 relative z-10">
-                    <button onClick={switchTokens} className="w-10 h-10 rounded-full bg-[#111a12] border-4 border-[#111a12] flex items-center justify-center hover:bg-[#1a2e1c] shadow-lg ring-1 ring-[#22c55e]/20"><ArrowDownUp size={16} className="text-[#22c55e]" /></button>
+                    <button onClick={switchTokens} className="w-10 h-10 rounded-full bg-[#ffffff] border-4 border-[#ffffff] flex items-center justify-center hover:bg-[#edf5f0] shadow-lg ring-1 ring-[#13895c]/20"><ArrowDownUp size={16} className="text-[#13895c]" /></button>
                   </div>
 
-                  <div className="bg-[#0a1a0c] rounded-2xl p-4 border border-transparent hover:border-[#1f3a22] transition-colors">
-                    <div className="flex justify-between text-xs text-[#8bb88f] mb-2">
+                  <div className="bg-[#f5f7f6] rounded-2xl p-4 border border-transparent hover:border-[#e3e9e5] transition-colors">
+                    <div className="flex justify-between text-xs text-[#65746b] mb-2">
                       <span>You receive</span>
-                      <span>Balance: {connected ? (toRealBalance.isReal ? parseFloat(toRealBalance.formatted).toFixed(4) : '0.0000') : '0.0'} {toToken.symbol} {toRealBalance.isReal && <span className="text-[#22c55e]">• Real</span>}</span>
+                      <span>Balance: {connected ? (toRealBalance.isReal ? parseFloat(toRealBalance.formatted).toFixed(4) : '0.0000') : '0.0'} {toToken.symbol} {toRealBalance.isReal && <span className="text-[#13895c]">• Real</span>}</span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <input value={toAmount} readOnly placeholder="0.0" className="flex-1 bg-transparent text-[24px] font-medium outline-none placeholder:text-[#8bb88f]/50" />
-                      <button onClick={() => setShowTokenSelect('to')} className="flex items-center gap-2 bg-[#111a12] hover:bg-[#1a2e1c] rounded-full px-3 py-1.5 font-semibold shadow border border-[#1f3a22]">
+                      <input value={toAmount} readOnly placeholder="0.0" className="flex-1 bg-transparent text-[24px] font-medium outline-none placeholder:text-[#65746b]/50" />
+                      <button onClick={() => setShowTokenSelect('to')} className="flex items-center gap-2 bg-[#ffffff] hover:bg-[#edf5f0] rounded-full px-3 py-1.5 font-semibold shadow border border-[#e3e9e5]">
                         <TokenIcon token={toToken} size={24} />{toToken.symbol}<ChevronDown size={16} />
                       </button>
                     </div>
-                    <div className="text-xs text-[#8bb88f] mt-1 flex items-center gap-1">
+                    <div className="text-xs text-[#65746b] mt-1 flex items-center gap-1">
                       ${toAmount && toToken.price !== 0 ? (parseFloat(toAmount) * toToken.price).toFixed(2) : '0.00'} {toToken.price !== 0 ? `• Real: $${toToken.price.toFixed(4)}` : '• No price'} • Sec: {toSecurity.score}/100
-                      {toToken.official && <span className="text-[#22c55e] flex items-center gap-1"><ShieldCheck size={10} /> Official LDX</span>}
+                      {toToken.official && <span className="text-[#13895c] flex items-center gap-1"><ShieldCheck size={10} /> Official LDX</span>}
                     </div>
                   </div>
                 </div>
 
                 {fromAmount && toAmount && fromToken.price !== 0 && toToken.price !== 0 && (
-                  <div className="mx-2 mt-2 p-3 rounded-2xl bg-[#0a1a0c]/70 border border-[#1f3a22]/50 text-sm space-y-2">
-                    <div className="flex justify-between"><span className="text-[#8bb88f] flex items-center gap-1"><Shield size={12} /> Price</span><span>{(fromToken.price / toToken.price).toFixed(6)} {toToken.symbol} per {fromToken.symbol} • Live</span></div>
-                    <div className="flex justify-between"><span className="text-[#8bb88f]">Minimum received</span><span>{minReceived} {toToken.symbol}</span></div>
-                    <div className="flex justify-between"><span className="text-[#8bb88f]">Price Impact</span><span style={{ color: priceImpactRisk.color }}>{priceImpact.toFixed(2)}% • {priceImpactRisk.text}</span></div>
-                    <div className="flex justify-between"><span className="text-[#8bb88f]">Security</span><span className="text-[#22c55e] text-xs flex items-center gap-1"><ShieldCheck size={12} /> Non-custodial • Verified • BSC</span></div>
+                  <div className="mx-2 mt-2 p-3 rounded-2xl bg-[#f5f7f6]/70 border border-[#e3e9e5]/50 text-sm space-y-2">
+                    <div className="flex justify-between"><span className="text-[#65746b] flex items-center gap-1"><Shield size={12} /> Price</span><span>{(fromToken.price / toToken.price).toFixed(6)} {toToken.symbol} per {fromToken.symbol} • Live</span></div>
+                    <div className="flex justify-between"><span className="text-[#65746b]">Minimum received</span><span>{minReceived} {toToken.symbol}</span></div>
+                    <div className="flex justify-between"><span className="text-[#65746b]">Price Impact</span><span style={{ color: priceImpactRisk.color }}>{priceImpact.toFixed(2)}% • {priceImpactRisk.text}</span></div>
+                    <div className="flex justify-between"><span className="text-[#65746b]">Security</span><span className="text-[#13895c] text-xs flex items-center gap-1"><ShieldCheck size={12} /> Non-custodial • Verified • BSC</span></div>
                   </div>
                 )}
 
@@ -978,15 +978,15 @@ export default function App() {
                 {fromToken.price === 0 && fromAmount && (
                   <div className="mx-2 mt-2 p-3 rounded-2xl bg-[#ef4444]/10 border border-[#ef4444]/20 text-xs">
                     <div className="font-bold text-[#ef4444] flex items-center gap-1"><AlertTriangle size={12} /> Security: No liquidity - Price $0</div>
-                    <div className="text-[#8bb88f] mt-1">Real on-chain price is $0. This token has no liquidity pool. High risk - potential honeypot. Only proceed if you are adding initial liquidity.</div>
+                    <div className="text-[#65746b] mt-1">Real on-chain price is $0. This token has no liquidity pool. High risk - potential honeypot. Only proceed if you are adding initial liquidity.</div>
                   </div>
                 )}
 
                 {chainId !== 56 && connected && (
                   <div className="mx-2 mt-2 p-3 rounded-2xl bg-[#ef4444]/10 border border-[#ef4444]/20 text-xs">
                     <div className="font-bold text-[#ef4444]">Wrong Network - Security Risk</div>
-                    <div className="text-[#8bb88f] mt-1">You are on chain {chainId}. Switch to BSC Mainnet (56) to see real balances and trade securely.</div>
-                    <button onClick={() => switchChain({ chainId: bsc.id })} className="mt-2 bg-[#ef4444] text-white px-3 py-1 rounded-full text-xs font-bold">Switch to BSC Securely</button>
+                    <div className="text-[#65746b] mt-1">You are on chain {chainId}. Switch to BSC Mainnet (56) to see real balances and trade securely.</div>
+                    <button onClick={() => switchChain({ chainId: bsc.id })} className="mt-2 bg-[#ef4444] text-[#1d2922] px-3 py-1 rounded-full text-xs font-bold">Switch to BSC Securely</button>
                   </div>
                 )}
 
@@ -997,18 +997,18 @@ export default function App() {
                   {connected && chainId === BALANCE_CHAIN_ID && quoteError && !sameSwapToken && (
                     <div className="mb-2 rounded-2xl border border-[#eab308]/30 bg-[#eab308]/10 px-3 py-2 text-xs text-[#eab308]">No LidexSwap pool quote is available for this token pair and amount.</div>
                   )}
-                  <button onClick={handleSwap} disabled={isSwapping || (!fromAmount && connected) || !isValidAddress(ROUTER_ADDRESS) || (connected && chainId === BALANCE_CHAIN_ID && (!parsedSwapAmount || !hasKnownInputBalance || insufficientInputBalance || sameSwapToken || !quotedOutput || inputAllowance === undefined)) || (connected && !swapValidation.valid && !swapValidation.isWarning)} className={`w-full h-[48px] rounded-2xl font-bold text-[16px] transition-all flex items-center justify-center gap-2 ${!connected ? 'bg-[#22c55e] hover:bg-[#16a34a] text-black shadow-[0_4px_15px_rgba(34,197,94,0.4)]' : !fromAmount || !quotedOutput || sameSwapToken ? 'bg-[#1a2e1c] text-[#8bb88f] cursor-not-allowed border border-[#1f3a22]' : priceImpactRisk.level === 'critical' ? 'bg-[#ef4444] text-white' : 'bg-[#22c55e] hover:bg-[#16a34a] text-black shadow-[0_4px_15px_rgba(34,197,94,0.4)]'}`}>
+                  <button onClick={handleSwap} disabled={isSwapping || (!fromAmount && connected) || !isValidAddress(ROUTER_ADDRESS) || (connected && chainId === BALANCE_CHAIN_ID && (!parsedSwapAmount || !hasKnownInputBalance || insufficientInputBalance || sameSwapToken || !quotedOutput || inputAllowance === undefined)) || (connected && !swapValidation.valid && !swapValidation.isWarning)} className={`w-full h-[48px] rounded-2xl font-bold text-[16px] transition-all flex items-center justify-center gap-2 ${!connected ? 'bg-[#13895c] hover:bg-[#0e7049] text-black shadow-[0_4px_15px_rgba(19,137,92,0.4)]' : !fromAmount || !quotedOutput || sameSwapToken ? 'bg-[#edf5f0] text-[#65746b] cursor-not-allowed border border-[#e3e9e5]' : priceImpactRisk.level === 'critical' ? 'bg-[#ef4444] text-[#1d2922]' : 'bg-[#13895c] hover:bg-[#0e7049] text-black shadow-[0_4px_15px_rgba(19,137,92,0.4)]'}`}>
                     {isSwapping && <RefreshCw size={16} className="animate-spin" />}
                     {!isSwapping && !connected && <ShieldCheck size={16} />}
                     {!isSwapping && connected && chainId === BALANCE_CHAIN_ID && !needsApproval && quotedOutput && <Lock size={16} />}
                     {swapButtonLabel}
                   </button>
-                  <div className="mt-2 text-[10px] text-[#8bb88f] text-center">{balancesLoading ? 'Reading balances from BSC...' : 'Balances update from the connected wallet.'}</div>
+                  <div className="mt-2 text-[10px] text-[#65746b] text-center">{balancesLoading ? 'Reading balances from BSC...' : 'Balances update from the connected wallet.'}</div>
                 </div>
 
-                <div className="px-5 py-3 flex items-center justify-between text-xs text-[#8bb88f] border-t border-[#1f3a22]/30">
-                  <span className="flex items-center gap-1.5"><ShieldCheck size={12} className="text-[#22c55e]" /> Secured • Real balances • Live market</span>
-                  <span className="flex items-center gap-1">{lastPriceUpdate ? `Updated ${lastPriceUpdate.toLocaleTimeString()}` : 'Live'} <span className="w-1.5 h-1.5 bg-[#22c55e] rounded-full animate-pulse" /></span>
+                <div className="px-5 py-3 flex items-center justify-between text-xs text-[#65746b] border-t border-[#e3e9e5]/30">
+                  <span className="flex items-center gap-1.5"><ShieldCheck size={12} className="text-[#13895c]" /> Secured • Real balances • Live market</span>
+                  <span className="flex items-center gap-1">{lastPriceUpdate ? `Updated ${lastPriceUpdate.toLocaleTimeString()}` : 'Live'} <span className="w-1.5 h-1.5 bg-[#13895c] rounded-full animate-pulse" /></span>
                 </div>
               </div>
             </div>
@@ -1017,42 +1017,42 @@ export default function App() {
 
         {view === 'liquidity' && (
           <div className="max-w-[700px] mx-auto">
-            <div className="bg-[#111a12] rounded-[24px] border border-[#1f3a22] p-5">
-              <h2 className="text-xl font-bold flex items-center gap-2 mb-4"><ShieldCheck size={20} className="text-[#22c55e]" /> Liquidity - Secured • Real Balances</h2>
-              <div className="bg-[#0a1a0c] border border-[#22c55e]/20 rounded-2xl p-3 mb-4 text-xs">
-                <div className="font-bold text-[#22c55e] flex items-center gap-1"><Wallet size={12} /> Connected • BSC Mainnet • Secured</div>
-                <div className="text-[#8bb88f] mt-1">{connected ? `${walletAddress} • ${bnbBalance ? parseFloat(bnbBalance.formatted).toFixed(4) + ' BNB' : 'Connected'}` : 'Connect to see balances'} • Reown AppKit</div>
+            <div className="bg-[#ffffff] rounded-[24px] border border-[#e3e9e5] p-5">
+              <h2 className="text-xl font-bold flex items-center gap-2 mb-4"><ShieldCheck size={20} className="text-[#13895c]" /> Liquidity - Secured • Real Balances</h2>
+              <div className="bg-[#f5f7f6] border border-[#13895c]/20 rounded-2xl p-3 mb-4 text-xs">
+                <div className="font-bold text-[#13895c] flex items-center gap-1"><Wallet size={12} /> Connected • BSC Mainnet • Secured</div>
+                <div className="text-[#65746b] mt-1">{connected ? `${walletAddress} • ${bnbBalance ? parseFloat(bnbBalance.formatted).toFixed(4) + ' BNB' : 'Connected'}` : 'Connect to see balances'} • Reown AppKit</div>
               </div>
               {!connected ? (
-                <div className="text-center py-16 bg-[#0a1a0c] rounded-2xl border border-[#1f3a22]">
-                  <ShieldCheck size={32} className="mx-auto text-[#22c55e] mb-3" />
-                  <div className="text-[#8bb88f] mb-2">Connect wallet securely via Reown AppKit to see real balances</div>
-                  <div className="text-xs text-[#8bb88f] mb-3">Non-custodial • Encrypted • 300+ wallets • BSC Mainnet • Real on-chain balances</div>
-                  <button onClick={() => appKit.open()} className="bg-[#22c55e] text-black px-6 py-2.5 rounded-2xl font-bold flex items-center gap-2 mx-auto"><Lock size={14} /> Connect Wallet - Secure</button>
+                <div className="text-center py-16 bg-[#f5f7f6] rounded-2xl border border-[#e3e9e5]">
+                  <ShieldCheck size={32} className="mx-auto text-[#13895c] mb-3" />
+                  <div className="text-[#65746b] mb-2">Connect wallet securely via Reown AppKit to see real balances</div>
+                  <div className="text-xs text-[#65746b] mb-3">Non-custodial • Encrypted • 300+ wallets • BSC Mainnet • Real on-chain balances</div>
+                  <button onClick={() => appKit.open()} className="bg-[#13895c] text-black px-6 py-2.5 rounded-2xl font-bold flex items-center gap-2 mx-auto"><Lock size={14} /> Connect Wallet - Secure</button>
                 </div>
               ) : (
                 <>
-                  <div className="flex justify-between items-center mb-4"><span className="text-[#8bb88f]">{liquidityPositions.length} positions • {connected ? `${walletAddress}` : 'Not connected'}</span><button onClick={() => setShowAddLiq(true)} className="bg-[#22c55e] text-black px-4 py-1.5 rounded-full text-sm font-bold flex items-center gap-1"><Plus size={14} /> Add Liquidity</button></div>
+                  <div className="flex justify-between items-center mb-4"><span className="text-[#65746b]">{liquidityPositions.length} positions • {connected ? `${walletAddress}` : 'Not connected'}</span><button onClick={() => setShowAddLiq(true)} className="bg-[#13895c] text-black px-4 py-1.5 rounded-full text-sm font-bold flex items-center gap-1"><Plus size={14} /> Add Liquidity</button></div>
                   {showAddLiq ? (
-                    <div className="bg-[#0a1a0c] rounded-2xl p-4 space-y-3 border border-[#22c55e]/30">
-                      <div className="flex justify-between items-center"><h3 className="font-bold flex items-center gap-1"><Shield size={14} className="text-[#22c55e]" /> Add Liquidity - Secured</h3><button onClick={() => setShowAddLiq(false)}><X size={18} /></button></div>
-                      {!pairExists && <div className="bg-[#1a2e1c] border border-[#84cc16]/30 rounded-xl p-3 text-xs"><div className="font-bold text-[#84cc16]">First provider! You set real price.</div><div className="text-[#8bb88f]">No price yet for {liqTokenA.symbol}/{liqTokenB.symbol} - you set it securely on-chain.</div></div>}
-                      <div className="bg-[#111a12] rounded-2xl p-4 border border-[#1f3a22]">
-                        <div className="text-xs text-[#8bb88f] mb-2 flex justify-between"><span>Token A • Real: ${liqTokenA.price === 0 ? 'No price' : liqTokenA.price.toFixed(4)} • Sec: {getSecurityScore(liqTokenA).score}/100</span><span className="text-[#22c55e]">Bal: {getBalanceForToken(liqTokenA).isReal ? parseFloat(getBalanceForToken(liqTokenA).formatted).toFixed(4) : '0'}</span></div>
-                        <div className="flex gap-3"><input value={liqAmountA} onChange={e => handleLiqACalc(e.target.value)} placeholder="0.0" className="flex-1 bg-transparent text-xl outline-none" /><button onClick={() => setShowTokenSelect('liqA')} className="flex items-center gap-2 bg-[#0a1a0c] px-3 py-1.5 rounded-full border border-[#1f3a22]"><TokenIcon token={liqTokenA} size={20} />{liqTokenA.symbol}<ChevronDown size={14} /></button></div>
+                    <div className="bg-[#f5f7f6] rounded-2xl p-4 space-y-3 border border-[#13895c]/30">
+                      <div className="flex justify-between items-center"><h3 className="font-bold flex items-center gap-1"><Shield size={14} className="text-[#13895c]" /> Add Liquidity - Secured</h3><button onClick={() => setShowAddLiq(false)}><X size={18} /></button></div>
+                      {!pairExists && <div className="bg-[#edf5f0] border border-[#13895c]/30 rounded-xl p-3 text-xs"><div className="font-bold text-[#13895c]">First provider! You set real price.</div><div className="text-[#65746b]">No price yet for {liqTokenA.symbol}/{liqTokenB.symbol} - you set it securely on-chain.</div></div>}
+                      <div className="bg-[#ffffff] rounded-2xl p-4 border border-[#e3e9e5]">
+                        <div className="text-xs text-[#65746b] mb-2 flex justify-between"><span>Token A • Real: ${liqTokenA.price === 0 ? 'No price' : liqTokenA.price.toFixed(4)} • Sec: {getSecurityScore(liqTokenA).score}/100</span><span className="text-[#13895c]">Bal: {getBalanceForToken(liqTokenA).isReal ? parseFloat(getBalanceForToken(liqTokenA).formatted).toFixed(4) : '0'}</span></div>
+                        <div className="flex gap-3"><input value={liqAmountA} onChange={e => handleLiqACalc(e.target.value)} placeholder="0.0" className="flex-1 bg-transparent text-xl outline-none" /><button onClick={() => setShowTokenSelect('liqA')} className="flex items-center gap-2 bg-[#f5f7f6] px-3 py-1.5 rounded-full border border-[#e3e9e5]"><TokenIcon token={liqTokenA} size={20} />{liqTokenA.symbol}<ChevronDown size={14} /></button></div>
                       </div>
-                      <div className="flex justify-center -my-2"><div className="w-8 h-8 rounded-full bg-[#1a2e1c] flex items-center justify-center border border-[#1f3a22]"><Plus size={14} /></div></div>
-                      <div className="bg-[#111a12] rounded-2xl p-4 border border-[#1f3a22]">
-                        <div className="text-xs text-[#8bb88f] mb-2 flex justify-between"><span>Token B • Real: ${liqTokenB.price === 0 ? 'No price' : liqTokenB.price.toFixed(4)} • Sec: {getSecurityScore(liqTokenB).score}/100</span><span className="text-[#22c55e]">Bal: {getBalanceForToken(liqTokenB).isReal ? parseFloat(getBalanceForToken(liqTokenB).formatted).toFixed(4) : '0'}</span></div>
-                        <div className="flex gap-3"><input value={liqAmountB} onChange={e => handleLiqBCalc(e.target.value)} placeholder="0.0" className="flex-1 bg-transparent text-xl outline-none" /><button onClick={() => setShowTokenSelect('liqB')} className="flex items-center gap-2 bg-[#0a1a0c] px-3 py-1.5 rounded-full border border-[#1f3a22]"><TokenIcon token={liqTokenB} size={20} />{liqTokenB.symbol}<ChevronDown size={14} /></button></div>
+                      <div className="flex justify-center -my-2"><div className="w-8 h-8 rounded-full bg-[#edf5f0] flex items-center justify-center border border-[#e3e9e5]"><Plus size={14} /></div></div>
+                      <div className="bg-[#ffffff] rounded-2xl p-4 border border-[#e3e9e5]">
+                        <div className="text-xs text-[#65746b] mb-2 flex justify-between"><span>Token B • Real: ${liqTokenB.price === 0 ? 'No price' : liqTokenB.price.toFixed(4)} • Sec: {getSecurityScore(liqTokenB).score}/100</span><span className="text-[#13895c]">Bal: {getBalanceForToken(liqTokenB).isReal ? parseFloat(getBalanceForToken(liqTokenB).formatted).toFixed(4) : '0'}</span></div>
+                        <div className="flex gap-3"><input value={liqAmountB} onChange={e => handleLiqBCalc(e.target.value)} placeholder="0.0" className="flex-1 bg-transparent text-xl outline-none" /><button onClick={() => setShowTokenSelect('liqB')} className="flex items-center gap-2 bg-[#f5f7f6] px-3 py-1.5 rounded-full border border-[#e3e9e5]"><TokenIcon token={liqTokenB} size={20} />{liqTokenB.symbol}<ChevronDown size={14} /></button></div>
                       </div>
-                      <div className="bg-[#1a2e1c]/50 border border-[#22c55e]/20 rounded-xl p-2 text-[11px] text-[#8bb88f] flex items-center gap-1"><Lock size={10} className="text-[#22c55e]" /> Secured: Non-custodial liquidity - you own LP tokens - no admin keys - audited</div>
-                      <button onClick={handleAddLiquidity} className="w-full h-12 rounded-2xl bg-[#22c55e] text-black font-bold flex items-center justify-center gap-2"><ShieldCheck size={16} /> Add Liquidity Securely - BSC</button>
+                      <div className="bg-[#edf5f0]/50 border border-[#13895c]/20 rounded-xl p-2 text-[11px] text-[#65746b] flex items-center gap-1"><Lock size={10} className="text-[#13895c]" /> Secured: Non-custodial liquidity - you own LP tokens - no admin keys - audited</div>
+                      <button onClick={handleAddLiquidity} className="w-full h-12 rounded-2xl bg-[#13895c] text-black font-bold flex items-center justify-center gap-2"><ShieldCheck size={16} /> Add Liquidity Securely - BSC</button>
                     </div>
                   ) : (
-                    <div className="text-center py-12 bg-[#0a1a0c] rounded-2xl border border-dashed border-[#1f3a22]">
-                      <div className="text-xs text-[#8bb88f] mb-4">{walletAddress} • {bnbBalance ? `${parseFloat(bnbBalance.formatted).toFixed(4)} BNB` : 'BSC'} • Secured via Reown</div>
-                      <button onClick={() => setShowAddLiq(true)} className="bg-[#22c55e] text-black px-4 py-2 rounded-full text-sm font-bold">Add Liquidity - Set Real Price</button>
+                    <div className="text-center py-12 bg-[#f5f7f6] rounded-2xl border border-dashed border-[#e3e9e5]">
+                      <div className="text-xs text-[#65746b] mb-4">{walletAddress} • {bnbBalance ? `${parseFloat(bnbBalance.formatted).toFixed(4)} BNB` : 'BSC'} • Secured via Reown</div>
+                      <button onClick={() => setShowAddLiq(true)} className="bg-[#13895c] text-black px-4 py-2 rounded-full text-sm font-bold">Add Liquidity - Set Real Price</button>
                     </div>
                   )}
                 </>
@@ -1063,11 +1063,11 @@ export default function App() {
 
         {view === 'farms' && (
           <div className="max-w-[1000px] mx-auto">
-            <h1 className="text-[28px] font-bold flex items-center gap-3"><ShieldCheck size={28} className="text-[#22c55e]" /> Farms - Secured • Real APR</h1>
-            <p className="text-[#8bb88f] text-sm">{connected ? `${walletAddress} • ${bnbBalance ? parseFloat(bnbBalance.formatted).toFixed(4) + ' BNB' : 'Connected'}` : 'Connect to see balances'} • Secured • Audited • BSC</p>
+            <h1 className="text-[28px] font-bold flex items-center gap-3"><ShieldCheck size={28} className="text-[#13895c]" /> Farms - Secured • Real APR</h1>
+            <p className="text-[#65746b] text-sm">{connected ? `${walletAddress} • ${bnbBalance ? parseFloat(bnbBalance.formatted).toFixed(4) + ' BNB' : 'Connected'}` : 'Connect to see balances'} • Secured • Audited • BSC</p>
             <div className="grid md:grid-cols-2 gap-4 mt-6">
-              <div className="bg-[#111a12] rounded-2xl border border-[#1f3a22] p-4"><div className="font-bold flex items-center gap-2">LDX-BNB <ShieldCheck size={14} className="text-[#22c55e]" /> Real: {ldxRealData.listed ? `$${ldxRealData.price}` : '$0'}</div><div className="text-xs text-[#8bb88f]">Official: {LIDEX_ADDRESS.slice(0,10)}... • Secured • {connected ? walletAddress : 'Connect wallet'}</div></div>
-              <div className="bg-[#111a12] rounded-2xl border border-[#1f3a22] p-4"><div className="font-bold">BNB Real: ${livePrices['binancecoin']?.toFixed(2)} • BSC Mainnet</div><div className="text-xs text-[#22c55e]">Live • Secured • {connected && bnbBalance ? `${parseFloat(bnbBalance.formatted).toFixed(4)} BNB` : 'Connect wallet'}</div></div>
+              <div className="bg-[#ffffff] rounded-2xl border border-[#e3e9e5] p-4"><div className="font-bold flex items-center gap-2">LDX-BNB <ShieldCheck size={14} className="text-[#13895c]" /> Real: {ldxRealData.listed ? `$${ldxRealData.price}` : '$0'}</div><div className="text-xs text-[#65746b]">Official: {LIDEX_ADDRESS.slice(0,10)}... • Secured • {connected ? walletAddress : 'Connect wallet'}</div></div>
+              <div className="bg-[#ffffff] rounded-2xl border border-[#e3e9e5] p-4"><div className="font-bold">BNB Real: ${livePrices['binancecoin']?.toFixed(2)} • BSC Mainnet</div><div className="text-xs text-[#13895c]">Live • Secured • {connected && bnbBalance ? `${parseFloat(bnbBalance.formatted).toFixed(4)} BNB` : 'Connect wallet'}</div></div>
             </div>
           </div>
         )}
@@ -1075,19 +1075,19 @@ export default function App() {
 
       {showTokenSelect && (
         <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center bg-black/70 backdrop-blur-sm p-0 md:p-4">
-          <div className="bg-[#111a12] w-full md:max-w-[440px] rounded-t-[24px] md:rounded-[24px] border border-[#1f3a22] max-h-[85vh] flex flex-col">
-            <div className="p-5 flex justify-between items-center border-b border-[#1f3a22]"><h3 className="font-bold text-lg flex items-center gap-2"><Shield size={18} className="text-[#22c55e]" /> Select Token - Real Balances • Secured</h3><button onClick={() => { setShowTokenSelect(null); setSearchQuery('') }} className="w-8 h-8 rounded-full bg-[#0a1a0c] flex items-center justify-center border border-[#1f3a22]"><X size={16} /></button></div>
+          <div className="bg-[#ffffff] w-full md:max-w-[440px] rounded-t-[24px] md:rounded-[24px] border border-[#e3e9e5] max-h-[85vh] flex flex-col">
+            <div className="p-5 flex justify-between items-center border-b border-[#e3e9e5]"><h3 className="font-bold text-lg flex items-center gap-2"><Shield size={18} className="text-[#13895c]" /> Select Token - Real Balances • Secured</h3><button onClick={() => { setShowTokenSelect(null); setSearchQuery('') }} className="w-8 h-8 rounded-full bg-[#f5f7f6] flex items-center justify-center border border-[#e3e9e5]"><X size={16} /></button></div>
             <div className="p-4">
-              <div className="relative"><Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8bb88f]" /><input value={searchQuery} onChange={e => setSearchQuery(sanitizeAddress(e.target.value) || e.target.value)} placeholder="Search or paste address - secured validation" className="w-full bg-[#0a1a0c] border border-[#1f3a22] rounded-2xl pl-10 pr-4 py-3 outline-none text-sm font-mono" /></div>
-              <div className="mt-2 text-[10px] text-[#8bb88f] flex items-center gap-1"><Lock size={10} /> Security: All addresses validated • Official LDX verified • No phishing</div>
+              <div className="relative"><Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#65746b]" /><input value={searchQuery} onChange={e => setSearchQuery(sanitizeAddress(e.target.value) || e.target.value)} placeholder="Search or paste address - secured validation" className="w-full bg-[#f5f7f6] border border-[#e3e9e5] rounded-2xl pl-10 pr-4 py-3 outline-none text-sm font-mono" /></div>
+              <div className="mt-2 text-[10px] text-[#65746b] flex items-center gap-1"><Lock size={10} /> Security: All addresses validated • Official LDX verified • No phishing</div>
             </div>
             <div className="flex-1 overflow-y-auto px-2 pb-4 space-y-1">
               {isSearchAddressNotInList && (
-                <div className="bg-[#1a2e1c] border border-[#84cc16]/30 rounded-xl p-3 mb-2">
-                  <div className="text-sm font-bold text-[#84cc16] flex items-center gap-1"><AlertTriangle size={14} /> Import custom - Security Check Required</div>
+                <div className="bg-[#edf5f0] border border-[#13895c]/30 rounded-xl p-3 mb-2">
+                  <div className="text-sm font-bold text-[#13895c] flex items-center gap-1"><AlertTriangle size={14} /> Import custom - Security Check Required</div>
                   <div className="text-xs truncate font-mono">{searchQuery}</div>
-                  <div className="text-[11px] text-[#8bb88f] mt-1">⚠️ Unverified token - high risk. Only import if you trust source. Check BscScan.</div>
-                  <button onClick={() => handleImportToken()} className="mt-2 w-full bg-[#22c55e] text-black rounded-full py-2 text-sm font-bold">Import with Security Warning</button>
+                  <div className="text-[11px] text-[#65746b] mt-1">⚠️ Unverified token - high risk. Only import if you trust source. Check BscScan.</div>
+                  <button onClick={() => handleImportToken()} className="mt-2 w-full bg-[#13895c] text-black rounded-full py-2 text-sm font-bold">Import with Security Warning</button>
                 </div>
               )}
               {filteredTokens.map(token => {
@@ -1100,16 +1100,16 @@ export default function App() {
                     else if (showTokenSelect === 'liqA') setLiqTokenA(token)
                     else if (showTokenSelect === 'liqB') setLiqTokenB(token)
                     setShowTokenSelect(null); setSearchQuery('')
-                  }} className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-[#0a1a0c] text-left border border-transparent hover:border-[#1f3a22]/50">
+                  }} className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-[#f5f7f6] text-left border border-transparent hover:border-[#e3e9e5]/50">
                     <div className="flex items-center gap-3">
                       <TokenIcon token={token} size={32} />
                       <div>
-                        <div className="font-bold text-[15px] flex items-center gap-1.5">{token.symbol} {token.verified ? <ShieldCheck size={12} className="text-[#22c55e]" /> : <span className="text-[9px] bg-[#ef4444]/20 text-[#ef4444] px-1 rounded">CUSTOM</span>} {token.official && <span className="text-[9px] bg-[#22c55e] text-black px-1 rounded">OFFICIAL</span>} <span className={`text-[9px] px-1 rounded ${sec.level === 'safe' ? 'bg-[#22c55e]/20 text-[#22c55e]' : sec.level === 'medium' ? 'bg-[#eab308]/20 text-[#eab308]' : 'bg-[#ef4444]/20 text-[#ef4444]'}`}>{sec.score}/100</span></div>
-                        <div className="text-xs text-[#8bb88f] flex items-center gap-1">{token.name} {token.official && <Lock size={10} className="text-[#22c55e]" />}</div>
-                        {connected && <div className="text-[11px] text-[#22c55e]">Real: {bal.isReal ? parseFloat(bal.formatted).toFixed(4) : '0'} {token.symbol} {bal.isReal ? '• On-chain' : '• No balance'}</div>}
+                        <div className="font-bold text-[15px] flex items-center gap-1.5">{token.symbol} {token.verified ? <ShieldCheck size={12} className="text-[#13895c]" /> : <span className="text-[9px] bg-[#ef4444]/20 text-[#ef4444] px-1 rounded">CUSTOM</span>} {token.official && <span className="text-[9px] bg-[#13895c] text-black px-1 rounded">OFFICIAL</span>} <span className={`text-[9px] px-1 rounded ${sec.level === 'safe' ? 'bg-[#13895c]/20 text-[#13895c]' : sec.level === 'medium' ? 'bg-[#eab308]/20 text-[#eab308]' : 'bg-[#ef4444]/20 text-[#ef4444]'}`}>{sec.score}/100</span></div>
+                        <div className="text-xs text-[#65746b] flex items-center gap-1">{token.name} {token.official && <Lock size={10} className="text-[#13895c]" />}</div>
+                        {connected && <div className="text-[11px] text-[#13895c]">Real: {bal.isReal ? parseFloat(bal.formatted).toFixed(4) : '0'} {token.symbol} {bal.isReal ? '• On-chain' : '• No balance'}</div>}
                       </div>
                     </div>
-                    <div className="text-right"><div className="text-xs text-[#8bb88f]">{token.price !== 0 ? `$${token.price < 1 ? token.price.toFixed(4) : token.price.toFixed(2)}` : 'No price'}</div><div className="text-[10px] text-[#8bb88f]">{bal.isReal && parseFloat(bal.formatted) > 0 ? `$${(parseFloat(bal.formatted) * token.price).toFixed(2)}` : sec.level}</div></div>
+                    <div className="text-right"><div className="text-xs text-[#65746b]">{token.price !== 0 ? `$${token.price < 1 ? token.price.toFixed(4) : token.price.toFixed(2)}` : 'No price'}</div><div className="text-[10px] text-[#65746b]">{bal.isReal && parseFloat(bal.formatted) > 0 ? `$${(parseFloat(bal.formatted) * token.price).toFixed(2)}` : sec.level}</div></div>
                   </button>
                 )
               })}
@@ -1120,59 +1120,59 @@ export default function App() {
 
       {showImportWarning && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-          <div className="bg-[#111a12] rounded-[24px] border border-[#ef4444]/30 w-full max-w-[380px] p-6">
+          <div className="bg-[#ffffff] rounded-[24px] border border-[#ef4444]/30 w-full max-w-[380px] p-6">
             <div className="flex items-center gap-2 text-[#ef4444] font-bold mb-3"><Shield size={20} /> Security Check - Import Token</div>
-            <div className="bg-[#0a1a0c] rounded-xl p-3 border border-[#1f3a22] mb-4">
-              <div className="flex items-center gap-3"><TokenIcon token={showImportWarning} size={40} /><div><div className="font-bold flex items-center gap-1">{showImportWarning.symbol} <span className="text-[10px] bg-[#ef4444]/20 text-[#ef4444] px-1 rounded">UNVERIFIED</span></div><div className="text-xs text-[#8bb88f]">{showImportWarning.name}</div></div></div>
+            <div className="bg-[#f5f7f6] rounded-xl p-3 border border-[#e3e9e5] mb-4">
+              <div className="flex items-center gap-3"><TokenIcon token={showImportWarning} size={40} /><div><div className="font-bold flex items-center gap-1">{showImportWarning.symbol} <span className="text-[10px] bg-[#ef4444]/20 text-[#ef4444] px-1 rounded">UNVERIFIED</span></div><div className="text-xs text-[#65746b]">{showImportWarning.name}</div></div></div>
               <div className="text-[11px] break-all mt-2 font-mono">{showImportWarning.address}</div>
               <div className="mt-2 text-[11px] text-[#ef4444]">⚠️ Risks: {getSecurityScore(showImportWarning).risks.join(' • ')}</div>
-              <div className="mt-1 text-[11px] text-[#8bb88f]">Security Score: {getSecurityScore(showImportWarning).score}/100 - {getSecurityScore(showImportWarning).level} risk</div>
+              <div className="mt-1 text-[11px] text-[#65746b]">Security Score: {getSecurityScore(showImportWarning).score}/100 - {getSecurityScore(showImportWarning).level} risk</div>
             </div>
-            <div className="bg-[#ef4444]/10 border border-[#ef4444]/20 rounded-xl p-2 text-[11px] text-[#8bb88f] mb-4">Security: Anyone can create a token with same name. Verify address on BscScan. LidexSwap is permissionless - we cannot guarantee safety of custom tokens. Only import trusted tokens.</div>
-            <div className="flex gap-2"><button onClick={() => setShowImportWarning(null)} className="flex-1 bg-[#1a2e1c] border border-[#1f3a22] rounded-full py-2.5 text-sm font-bold">Cancel - Secure</button><button onClick={confirmImport} className="flex-1 bg-[#ef4444] text-white rounded-full py-2.5 text-sm font-bold">I Understand Risk - Import</button></div>
+            <div className="bg-[#ef4444]/10 border border-[#ef4444]/20 rounded-xl p-2 text-[11px] text-[#65746b] mb-4">Security: Anyone can create a token with same name. Verify address on BscScan. LidexSwap is permissionless - we cannot guarantee safety of custom tokens. Only import trusted tokens.</div>
+            <div className="flex gap-2"><button onClick={() => setShowImportWarning(null)} className="flex-1 bg-[#edf5f0] border border-[#e3e9e5] rounded-full py-2.5 text-sm font-bold">Cancel - Secure</button><button onClick={confirmImport} className="flex-1 bg-[#ef4444] text-[#1d2922] rounded-full py-2.5 text-sm font-bold">I Understand Risk - Import</button></div>
           </div>
         </div>
       )}
 
       {showListTokenModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-          <div className="bg-[#111a12] rounded-[24px] border border-[#1f3a22] w-full max-w-[440px] p-6">
-            <div className="flex justify-between items-center mb-4"><h3 className="font-bold text-lg flex items-center gap-2"><ShieldCheck size={18} className="text-[#22c55e]" /> List Token - Secured</h3><button onClick={() => setShowListTokenModal(false)} className="w-8 h-8 rounded-full bg-[#0a1a0c] flex items-center justify-center border border-[#1f3a22]"><X size={16} /></button></div>
-            <div className="bg-[#0a1a0c] border border-[#22c55e]/20 rounded-2xl p-4 mb-4 text-xs">
-              <div className="font-bold text-[#22c55e] flex items-center gap-1"><Lock size={12} /> Security: Permissionless but audited - Official LDX verified</div>
-              <div className="text-[#8bb88f] mt-1">Official LDX: {LIDEX_ADDRESS} • {connected ? `${walletAddress} • Secured` : 'Connect wallet'} • BSC Mainnet</div>
+          <div className="bg-[#ffffff] rounded-[24px] border border-[#e3e9e5] w-full max-w-[440px] p-6">
+            <div className="flex justify-between items-center mb-4"><h3 className="font-bold text-lg flex items-center gap-2"><ShieldCheck size={18} className="text-[#13895c]" /> List Token - Secured</h3><button onClick={() => setShowListTokenModal(false)} className="w-8 h-8 rounded-full bg-[#f5f7f6] flex items-center justify-center border border-[#e3e9e5]"><X size={16} /></button></div>
+            <div className="bg-[#f5f7f6] border border-[#13895c]/20 rounded-2xl p-4 mb-4 text-xs">
+              <div className="font-bold text-[#13895c] flex items-center gap-1"><Lock size={12} /> Security: Permissionless but audited - Official LDX verified</div>
+              <div className="text-[#65746b] mt-1">Official LDX: {LIDEX_ADDRESS} • {connected ? `${walletAddress} • Secured` : 'Connect wallet'} • BSC Mainnet</div>
             </div>
-            <input value={newTokenAddress} onChange={e => setNewTokenAddress(sanitizeAddress(e.target.value))} placeholder="0x... any BEP-20 - secured validation" className="w-full bg-[#0a1a0c] border border-[#1f3a22] rounded-2xl px-4 py-3 outline-none text-sm font-mono" />
-            <div className="mt-2 text-[10px] text-[#8bb88f]">Security: Address sanitized • Validated • No phishing • Official LDX check</div>
-            <button onClick={handleListTokenDirect} disabled={!isValidAddress(newTokenAddress)} className={`mt-3 w-full h-12 rounded-2xl font-bold flex items-center justify-center gap-2 ${isValidAddress(newTokenAddress) ? 'bg-[#22c55e] text-black' : 'bg-[#1a2e1c] text-[#8bb88f] cursor-not-allowed border border-[#1f3a22]'}`}><ShieldCheck size={16} /> Import & List Securely</button>
+            <input value={newTokenAddress} onChange={e => setNewTokenAddress(sanitizeAddress(e.target.value))} placeholder="0x... any BEP-20 - secured validation" className="w-full bg-[#f5f7f6] border border-[#e3e9e5] rounded-2xl px-4 py-3 outline-none text-sm font-mono" />
+            <div className="mt-2 text-[10px] text-[#65746b]">Security: Address sanitized • Validated • No phishing • Official LDX check</div>
+            <button onClick={handleListTokenDirect} disabled={!isValidAddress(newTokenAddress)} className={`mt-3 w-full h-12 rounded-2xl font-bold flex items-center justify-center gap-2 ${isValidAddress(newTokenAddress) ? 'bg-[#13895c] text-black' : 'bg-[#edf5f0] text-[#65746b] cursor-not-allowed border border-[#e3e9e5]'}`}><ShieldCheck size={16} /> Import & List Securely</button>
           </div>
         </div>
       )}
 
       {txStatus && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-          <div className="bg-[#111a12] rounded-[24px] border border-[#1f3a22] w-full max-w-[360px] p-6 text-center">
+          <div className="bg-[#ffffff] rounded-[24px] border border-[#e3e9e5] w-full max-w-[360px] p-6 text-center">
             {txStatus === 'approving' || txStatus === 'pending' ? <>
-              <div className="w-20 h-20 mx-auto mb-4 rounded-full border-4 border-[#1a2e1c] border-t-[#22c55e] animate-spin" />
-              <h3 className="font-bold flex items-center justify-center gap-2"><Lock size={16} className="text-[#22c55e]" /> {txStatus === 'approving' ? 'Approve token in wallet' : 'Confirm swap in wallet'}</h3>
-              <div className="text-xs text-[#8bb88f] mt-2">{txStatus === 'approving' ? `Allow the LidexSwap router to spend ${fromToken.symbol}.` : `Swapping ${fromAmount} ${fromToken.symbol} for at least ${minReceived} ${toToken.symbol}.`}</div>
+              <div className="w-20 h-20 mx-auto mb-4 rounded-full border-4 border-[#edf5f0] border-t-[#13895c] animate-spin" />
+              <h3 className="font-bold flex items-center justify-center gap-2"><Lock size={16} className="text-[#13895c]" /> {txStatus === 'approving' ? 'Approve token in wallet' : 'Confirm swap in wallet'}</h3>
+              <div className="text-xs text-[#65746b] mt-2">{txStatus === 'approving' ? `Allow the LidexSwap router to spend ${fromToken.symbol}.` : `Swapping ${fromAmount} ${fromToken.symbol} for at least ${minReceived} ${toToken.symbol}.`}</div>
             </> : txStatus === 'approved' ? <>
-              <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-[#22c55e]/20 flex items-center justify-center text-3xl border border-[#22c55e]/30">✓</div>
-              <h3 className="font-bold flex items-center justify-center gap-2"><ShieldCheck size={16} className="text-[#22c55e]" /> Approval confirmed</h3>
-              <div className="text-xs text-[#8bb88f] mt-2">Your {fromToken.symbol} approval is confirmed. Submit the swap when ready.</div>
-              {txHash && <a href={`https://bscscan.com/tx/${txHash}`} target="_blank" rel="noreferrer" className="mt-3 inline-flex items-center gap-1 text-xs text-[#22c55e]">View approval <ExternalLink size={12} /></a>}
-              <button onClick={() => setTxStatus(null)} className="mt-4 w-full rounded-xl bg-[#1a2e1c] border border-[#1f3a22] py-2 text-sm font-bold">Close</button>
+              <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-[#13895c]/20 flex items-center justify-center text-3xl border border-[#13895c]/30">✓</div>
+              <h3 className="font-bold flex items-center justify-center gap-2"><ShieldCheck size={16} className="text-[#13895c]" /> Approval confirmed</h3>
+              <div className="text-xs text-[#65746b] mt-2">Your {fromToken.symbol} approval is confirmed. Submit the swap when ready.</div>
+              {txHash && <a href={`https://bscscan.com/tx/${txHash}`} target="_blank" rel="noreferrer" className="mt-3 inline-flex items-center gap-1 text-xs text-[#13895c]">View approval <ExternalLink size={12} /></a>}
+              <button onClick={() => setTxStatus(null)} className="mt-4 w-full rounded-xl bg-[#edf5f0] border border-[#e3e9e5] py-2 text-sm font-bold">Close</button>
             </> : txStatus === 'success' ? <>
-              <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-[#22c55e]/20 flex items-center justify-center text-3xl border border-[#22c55e]/30">✓</div>
-              <h3 className="font-bold flex items-center justify-center gap-2"><ShieldCheck size={16} className="text-[#22c55e]" /> Swap confirmed</h3>
-              <div className="text-xs text-[#8bb88f] mt-2">The transaction was confirmed on BNB Smart Chain.</div>
-              {txHash && <a href={`https://bscscan.com/tx/${txHash}`} target="_blank" rel="noreferrer" className="mt-3 inline-flex items-center gap-1 text-xs text-[#22c55e]">View transaction <ExternalLink size={12} /></a>}
-              <button onClick={() => setTxStatus(null)} className="mt-4 w-full rounded-xl bg-[#1a2e1c] border border-[#1f3a22] py-2 text-sm font-bold">Close</button>
+              <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-[#13895c]/20 flex items-center justify-center text-3xl border border-[#13895c]/30">✓</div>
+              <h3 className="font-bold flex items-center justify-center gap-2"><ShieldCheck size={16} className="text-[#13895c]" /> Swap confirmed</h3>
+              <div className="text-xs text-[#65746b] mt-2">The transaction was confirmed on BNB Smart Chain.</div>
+              {txHash && <a href={`https://bscscan.com/tx/${txHash}`} target="_blank" rel="noreferrer" className="mt-3 inline-flex items-center gap-1 text-xs text-[#13895c]">View transaction <ExternalLink size={12} /></a>}
+              <button onClick={() => setTxStatus(null)} className="mt-4 w-full rounded-xl bg-[#edf5f0] border border-[#e3e9e5] py-2 text-sm font-bold">Close</button>
             </> : <>
               <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-[#ef4444]/15 flex items-center justify-center text-3xl border border-[#ef4444]/30">!</div>
               <h3 className="font-bold flex items-center justify-center gap-2"><AlertTriangle size={16} className="text-[#ef4444]" /> Transaction failed</h3>
-              <div className="text-xs text-[#8bb88f] mt-2 break-words">{txError}</div>
-              <button onClick={() => setTxStatus(null)} className="mt-4 w-full rounded-xl bg-[#1a2e1c] border border-[#1f3a22] py-2 text-sm font-bold">Close</button>
+              <div className="text-xs text-[#65746b] mt-2 break-words">{txError}</div>
+              <button onClick={() => setTxStatus(null)} className="mt-4 w-full rounded-xl bg-[#edf5f0] border border-[#e3e9e5] py-2 text-sm font-bold">Close</button>
             </>}
           </div>
         </div>

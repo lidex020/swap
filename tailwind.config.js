@@ -8,32 +8,32 @@ export default {
     extend: {
       colors: {
         lidex: {
-          bg: '#050a06',
-          card: '#111a12',
-          card2: '#1a2e1c',
-          input: '#162416',
-          green: '#22c55e',
-          lime: '#84cc16',
-          bright: '#4ade80',
-          dark: '#052e0a',
-          border: '#1f3a22',
-          glow: '#22c55e'
+          bg: '#f7f9f8',
+          card: '#ffffff',
+          card2: '#edf5f0',
+          input: '#f5f7f6',
+          green: '#13895c',
+          lime: '#13895c',
+          bright: '#32a875',
+          dark: '#0b5c3c',
+          border: '#e3e9e5',
+          glow: '#13895c'
         },
         pancake: {
-          bg: '#050a06',
-          card: '#111a12',
-          card2: '#1a2e1c',
-          input: '#162416',
-          purple: '#22c55e',
-          cyan: '#4ade80',
+          bg: '#f7f9f8',
+          card: '#ffffff',
+          card2: '#edf5f0',
+          input: '#f5f7f6',
+          purple: '#13895c',
+          cyan: '#32a875',
           pink: '#ed4b9e',
-          yellow: '#84cc16',
-          dark: '#0a1a0c',
-          border: '#1f3a22'
+          yellow: '#13895c',
+          dark: '#f5f7f6',
+          border: '#e3e9e5'
         }
       },
       fontFamily: {
-        kanit: ['Kanit', 'sans-serif']
+        sans: ['Inter', 'sans-serif']
       },
       borderRadius: {
         '4xl': '24px'

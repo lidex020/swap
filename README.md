@@ -1,13 +1,12 @@
-# 🟢 LidexSwap - Green DEX
+# LidexSwap
 
-**Logo:** Green circular arrows (2 arrows forming a circle) on black background  
-**Brand Colors:** `#22c55e` (primary green), `#4ade80` (bright), `#84cc16` (lime), `#050a06` (dark)
+**Branding:** White surfaces, charcoal text, and Lidex green accents. Public brand images use JPG assets.
 
 LidexSwap is a React/Vite DEX frontend and Solidity contract set inspired by PancakeSwap. The frontend reads live BSC balances, but trading is disabled until a deployed and reviewed router is configured.
 
 **Live Preview:** Running on port 5173 - https://5173-il7fm30taoa1kpqpwj04q.e2b.app
 
-![LidexSwap Logo](/public/logo.png)
+![LidexSwap Logo](/public/logo.jpg)
 
 ## ✨ Features
 
@@ -15,7 +14,7 @@ LidexSwap is a React/Vite DEX frontend and Solidity contract set inspired by Pan
 - Constant Product Formula (x*y=k) with 0.25% Green Fee in the contracts
 - Real-time price, price impact, slippage (0.1%/0.5%/1%)
 - Token selector: LIDEX (native), BNB, USDT, USDC, ETH, BTCB, WBNB, CAKE
-- Live chart with green theme
+- Live chart with Lidex green accents
 - Swap UI fails closed when no deployed router is configured
 
 ### 💧 Liquidity
@@ -27,10 +26,10 @@ LidexSwap is a React/Vite DEX frontend and Solidity contract set inspired by Pan
 - Farms: Stake LP to earn LIDEX (124% APR for LIDEX-BNB)
 - Pools: Stake LIDEX
 
-### 🎨 UI - LidexSwap Green Theme
-- Background `#050a06`, Cards `#111a12`, Border `#1f3a22`
-- Primary green `#22c55e` with glow, lime `#84cc16`
-- Kanit font, rounded 24px, logo everywhere
+### UI
+- White and light-gray surfaces, charcoal typography, and green accents
+- Inter font with rounded 24px cards
+- JPG brand assets in `public/`
 
 ## 🛠️ Tech Stack
 - React 18 + Vite + Tailwind
@@ -40,10 +39,11 @@ LidexSwap is a React/Vite DEX frontend and Solidity contract set inspired by Pan
 ## 📁 Structure
 ```
 /src
-  App.jsx          # LidexSwap DEX - green theme
-  assets/logo.png  # Green circular arrows logo
+  App.jsx          # LidexSwap DEX
 /public
-  logo.png         # Logo
+  logo.jpg         # Site logo
+  lidex-token-logo.jpg
+  favicon.jpg
 /contracts
   LidexFactory.sol
   LidexPair.sol

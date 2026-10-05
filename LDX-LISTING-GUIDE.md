@@ -117,7 +117,7 @@ const LDX = {
   symbol: "LDX",
   name: "Lidex",
   decimals: 18,
-  logo: "/logo.png",
+  logo: "/lidex-token-logo.jpg",
   bscscan: "https://bscscan.com/token/0x567A4F63f6838005e104C053fc24a3510b0432E1"
 }
 ```

@@ -17,10 +17,9 @@ Green DEX smart contracts - Logo: green circular arrows on black background.
 - **Symbol:** LIDEX
 - **Logo:** Green circular arrows (2 arrows forming circle) - represents swap
 - **Colors:** 
-  - Primary Green: `#22c55e`
-  - Bright Green: `#4ade80`
-  - Lime: `#84cc16`
-  - Dark BG: `#050a06`
+  - Primary green accent: `#13895c`
+  - Bright green accent: `#32a875`
+  - Background: `#f7f9f8`
 - **Fee:** 0.25% (9975/10000) - Green sustainable fee
 
 ## Deployment (BSC Testnet)
@@ -45,7 +44,7 @@ Update `src/App.jsx`:
 
 ```js
 const TOKENS = [
-  { symbol: 'LIDEX', address: '0xYourLidexTokenAddress', logo: '/logo.png' },
+  { symbol: 'LIDEX', address: '0xYourLidexTokenAddress', logo: '/lidex-token-logo.jpg' },
   ...
 ]
 ```

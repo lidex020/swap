@@ -1,6 +1,6 @@
 {
   "name": "LidexSwap Token List",
-  "logoURI": "/logo.png",
+  "logoURI": "/logo.jpg",
   "keywords": ["lidexswap", "green", "bnb", "ldx"],
   "version": { "major": 1, "minor": 0, "patch": 0 },
   "tokens": [
@@ -10,7 +10,7 @@
       "name": "Lidex",
       "symbol": "LDX",
       "decimals": 18,
-      "logoURI": "/lidex-token-logo.png",
+      "logoURI": "/lidex-token-logo.jpg",
       "isNative": true,
       "isVerified": true,
       "tags": ["native", "governance"],

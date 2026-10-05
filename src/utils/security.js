@@ -73,7 +73,7 @@ export function getSecurityScore(token) {
 }
 
 export function getPriceImpactRisk(impact) {
-  if (impact < 0.5) return { level: 'safe', color: '#22c55e', text: 'Low impact' }
+  if (impact < 0.5) return { level: 'safe', color: '#13895c', text: 'Low impact' }
   if (impact < 2) return { level: 'medium', color: '#eab308', text: 'Medium impact' }
   if (impact < 5) return { level: 'high', color: '#f97316', text: 'High impact' }
   return { level: 'critical', color: '#ef4444', text: 'Very high impact - risky!' }

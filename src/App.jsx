@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { ArrowDownUp, Settings, Clock3, ChevronDown, X, Info, ExternalLink, Droplets, BarChart3, Coins, Zap, Menu, Wallet, Plus, Search, AlertTriangle, CheckCircle, Trash2, Upload, RefreshCw, TrendingUp, TrendingDown, Shield, ShieldCheck, Lock, Eye, AlertCircle } from 'lucide-react'
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
-import { useAccount, useDisconnect, useBalance, useSwitchChain, useReadContract, useReadContracts, usePublicClient, useWriteContract } from 'wagmi'
+import { useAccount, useDisconnect, useBalance, useSwitchChain, useReadContract, usePublicClient, useWriteContract } from 'wagmi'
 import { bsc as bscAppKit } from '@reown/appkit/networks'
 import { bsc } from 'wagmi/chains'
 import { formatUnits, parseUnits } from 'viem'
@@ -23,6 +23,9 @@ const ERC20_ABI = [
   { type: 'function', name: 'balanceOf', stateMutability: 'view', inputs: [{ name: 'owner', type: 'address' }], outputs: [{ name: '', type: 'uint256' }] },
   { type: 'function', name: 'allowance', stateMutability: 'view', inputs: [{ name: 'owner', type: 'address' }, { name: 'spender', type: 'address' }], outputs: [{ name: '', type: 'uint256' }] },
   { type: 'function', name: 'approve', stateMutability: 'nonpayable', inputs: [{ name: 'spender', type: 'address' }, { name: 'amount', type: 'uint256' }], outputs: [{ name: '', type: 'bool' }] },
+]
+const ERC20_DECIMALS_ABI = [
+  { type: 'function', name: 'decimals', stateMutability: 'view', inputs: [], outputs: [{ name: '', type: 'uint8' }] },
 ]
 
 const INITIAL_TOKENS = [
@@ -241,104 +244,127 @@ export default function App() {
     return [...baseWithRealPrices, ...customTokens]
   }, [livePrices, priceChanges, customTokens, ldxRealData])
 
-  // Real balances - Secure on-chain via wagmi useBalance (BNB) + useReadContracts for all ERC20
+  // Read native BNB through wagmi and ERC-20 balances directly from the BSC client.
   const [realTokenBalances, setRealTokenBalances] = useState({})
-  const [totalUsdValue, setTotalUsdValue] = useState(0)
-  const erc20Abi = ERC20_ABI
+  const [tokenBalanceErrors, setTokenBalanceErrors] = useState({})
+  const [erc20Loading, setErc20Loading] = useState(false)
+  const [erc20Error, setErc20Error] = useState(false)
+  const [balanceRefreshKey, setBalanceRefreshKey] = useState(0)
 
-  const tokenContracts = useMemo(() => {
-    if (!address) return []
-    // Fetch all tokens that have valid address, dedupe by address
+  const balanceTokens = useMemo(() => {
     const seen = new Set()
-    const contracts = []
-    for (const t of allTokens) {
-      if (!t.address || !t.address.startsWith('0x')) continue
+    return [...INITIAL_TOKENS, ...customTokens].filter(t => {
+      if (!t.address || !t.address.startsWith('0x')) return false
       const lower = t.address.toLowerCase()
-      if (seen.has(lower)) continue
+      if (seen.has(lower)) return false
       seen.add(lower)
-      contracts.push({
-        address: t.address,
-        abi: erc20Abi,
-        functionName: 'balanceOf',
-        args: [address],
-        chainId: BALANCE_CHAIN_ID,
-      })
-    }
-    return contracts
-  }, [address, allTokens, erc20Abi])
+      return true
+    })
+  }, [customTokens])
 
-  const { data: erc20Balances, isLoading: erc20Loading, isError: erc20Error, refetch: refetchErc20 } = useReadContracts({
-    contracts: tokenContracts,
-    allowFailure: true,
-    query: { enabled: !!address && chainId === BALANCE_CHAIN_ID && tokenContracts.length > 0 }
-  })
-
-  // Process real balances when data arrives
   useEffect(() => {
-    if (!address) {
+    if (!address || chainId !== BALANCE_CHAIN_ID) {
       setRealTokenBalances({})
-      setTotalUsdValue(0)
+      setTokenBalanceErrors({})
+      setErc20Error(false)
+      setErc20Loading(false)
       return
     }
-    const balances = {}
-    let total = 0
-    const bnbPrice = livePrices['binancecoin'] || 700
-
-    if (bnbBalance) {
-      const bnbVal = parseFloat(bnbBalance.formatted) || 0
-      total += bnbVal * bnbPrice
+    setRealTokenBalances({})
+    setTokenBalanceErrors({})
+    if (!publicClient) {
+      setTokenBalanceErrors(Object.fromEntries(balanceTokens.map(token => [token.address.toLowerCase(), true])))
+      setErc20Error(true)
+      setErc20Loading(false)
+      console.error('BSC public client is unavailable; token balances cannot be read.')
+      return
     }
 
-    if (erc20Balances) {
-      // Map contracts to results
-      const seen = new Set()
-      let idx = 0
-      for (const t of allTokens) {
-        if (!t.address || !t.address.startsWith('0x')) continue
-        const lower = t.address.toLowerCase()
-        if (seen.has(lower)) continue
-        seen.add(lower)
-        const result = erc20Balances[idx]
-        idx++
-        if (!result) continue
+    let cancelled = false
+    setErc20Loading(true)
+    setErc20Error(false)
+
+    const readBalances = async () => {
+      const results = await Promise.all(balanceTokens.map(async token => {
+        const key = token.address.toLowerCase()
         try {
-          if (result.status === 'success' && result.result !== undefined) {
-            const raw = result.result
-            const formatted = formatUnits(raw, t.decimals || 18)
-            balances[lower] = { formatted, value: parseFloat(formatted) || 0, symbol: t.symbol, raw }
-            if (t.price && t.price > 0) {
-              total += (parseFloat(formatted) || 0) * t.price
-            }
-          } else {
-            balances[lower] = { formatted: '0', value: 0, symbol: t.symbol }
-          }
-        } catch (e) {
-          balances[lower] = { formatted: '0', value: 0, symbol: t.symbol }
+          const [raw, decimals] = await Promise.all([
+            publicClient.readContract({
+              address: token.address,
+              abi: ERC20_ABI,
+              functionName: 'balanceOf',
+              args: [address],
+            }),
+            publicClient.readContract({
+              address: token.address,
+              abi: ERC20_DECIMALS_ABI,
+              functionName: 'decimals',
+            }),
+          ])
+          const formatted = formatUnits(raw, Number(decimals))
+          return { key, balance: { formatted, value: Number(formatted) || 0, symbol: token.symbol, raw } }
+        } catch (error) {
+          console.error(`Failed to read ${token.symbol} balance from BSC`, error)
+          return { key, error }
         }
+      }))
+
+      if (cancelled) return
+      const balances = {}
+      const errors = {}
+      for (const result of results) {
+        if (result.error) errors[result.key] = true
+        else balances[result.key] = result.balance
       }
+      setRealTokenBalances(balances)
+      setTokenBalanceErrors(errors)
+      setErc20Error(Object.keys(errors).length > 0)
+      setErc20Loading(false)
     }
 
-    setRealTokenBalances(balances)
-    setTotalUsdValue(total)
-  }, [address, bnbBalance, erc20Balances, allTokens, livePrices])
+    void readBalances().catch(error => {
+      if (cancelled) return
+      console.error('Failed to read ERC-20 balances from BSC', error)
+      setErc20Error(true)
+      setErc20Loading(false)
+    })
+
+    return () => { cancelled = true }
+  }, [address, chainId, balanceTokens, publicClient, balanceRefreshKey])
+
+  useEffect(() => {
+    if (!address || chainId !== BALANCE_CHAIN_ID) return
+    const interval = setInterval(() => setBalanceRefreshKey(key => key + 1), 30000)
+    return () => clearInterval(interval)
+  }, [address, chainId])
 
   const getBalanceForToken = (token) => {
     if (!token) return { formatted: '0', value: 0, isReal: false }
     if (!address) return { formatted: '0', value: 0, isReal: false }
     // BNB native uses bnbBalance
-    if (token.symbol === 'BNB' && bnbBalance) {
-      return { formatted: bnbBalance.formatted, value: parseFloat(bnbBalance.formatted) || 0, isReal: true }
+    if (token.symbol === 'BNB') {
+      if (bnbBalance) return { formatted: bnbBalance.formatted, value: parseFloat(bnbBalance.formatted) || 0, isReal: true }
+      return { formatted: '0', value: 0, isReal: false, isLoading: bnbLoading, isError: bnbError }
     }
     const key = token.address ? token.address.toLowerCase() : ''
     if (key && realTokenBalances[key]) {
       return { ...realTokenBalances[key], isReal: true }
     }
-    return { formatted: '0', value: 0, isReal: true }
+    return {
+      formatted: '0',
+      value: 0,
+      isReal: false,
+      isLoading: erc20Loading,
+      isError: Boolean(key && tokenBalanceErrors[key]),
+    }
   }
 
   const formatWalletBalance = (token) => {
     if (!connected) return null
     const balance = getBalanceForToken(token)
+    if (balance.isLoading) return 'Loading…'
+    if (balance.isError) return 'Unavailable'
+    if (!balance.isReal) return chainId === BALANCE_CHAIN_ID ? '—' : 'Switch to BSC'
     const value = Number(balance.value)
     if (!Number.isFinite(value)) return '0'
     if (value > 0 && value < 0.000001) return '<0.000001'
@@ -346,22 +372,17 @@ export default function App() {
   }
 
   const fromRealBalance = getBalanceForToken(fromToken)
-  const toRealBalance = getBalanceForToken(toToken)
   const balancesLoading = bnbLoading || erc20Loading
   const balancesError = bnbError || erc20Error
 
   const refetchAll = async () => {
+    setBalanceRefreshKey(key => key + 1)
     try {
-      await Promise.all([refetchBnb(), refetchErc20()])
+      await refetchBnb()
     } catch (e) {
       console.error('Failed to refresh wallet balances', e)
     }
   }
-
-  useEffect(() => {
-    if (!address || chainId !== BALANCE_CHAIN_ID) return
-    void refetchAll()
-  }, [address, chainId])
 
   useEffect(() => {
     setFromToken(prev => allTokens.find(t => t.address === prev.address) || prev)
@@ -751,71 +772,6 @@ export default function App() {
       </div>
 
       <main className="max-w-[1280px] mx-auto px-4 py-6 md:py-8">
-        {connected && (
-          <section aria-label="Wallet assets" className="mb-6 rounded-[24px] border border-[#e3e9e5] bg-[#ffffff] p-4 md:p-5">
-            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-              <div className="flex items-center gap-2">
-                <Wallet size={18} className="text-[#13895c]" />
-                <h2 className="font-bold">Wallet assets</h2>
-                <span className="text-xs text-[#65746b]">{walletAddress}</span>
-              </div>
-              <div className="flex items-center gap-3">
-                {chainId === BALANCE_CHAIN_ID && (
-                  <span className="text-sm font-semibold text-[#1d2922]">
-                    Est. total: ${totalUsdValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                  </span>
-                )}
-                <button
-                  type="button"
-                  onClick={() => { void refetchAll() }}
-                  aria-label="Refresh wallet balances"
-                  className="flex h-8 items-center gap-1.5 rounded-xl border border-[#e3e9e5] px-2.5 text-xs text-[#1d2922] hover:bg-[#edf5f0]"
-                >
-                  <RefreshCw size={13} className={balancesLoading ? 'animate-spin text-[#13895c]' : 'text-[#13895c]'} />
-                  Refresh
-                </button>
-              </div>
-            </div>
-            {chainId !== BALANCE_CHAIN_ID ? (
-              <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#ef4444]/30 bg-[#ef4444]/10 p-3 text-sm">
-                <span className="text-[#1d2922]">Switch to BNB Smart Chain to load on-chain token balances.</span>
-                <button onClick={() => switchChain({ chainId: bsc.id })} className="rounded-full bg-[#13895c] px-3 py-1.5 text-xs font-bold text-white">
-                  Switch to BSC
-                </button>
-              </div>
-            ) : (
-              <>
-                {balancesError && (
-                  <div role="status" className="mb-3 text-xs text-[#ef4444]">
-                    Some wallet balances could not be loaded. Use Refresh to try again.
-                  </div>
-                )}
-                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
-                  <div className="flex min-w-0 items-center gap-2 rounded-xl border border-[#e3e9e5] bg-[#f5f7f6] p-3">
-                    <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-[#13895c]/15 text-xs font-bold text-[#13895c]">BNB</div>
-                    <div className="min-w-0">
-                      <div className="text-xs text-[#65746b]">BNB</div>
-                      <div className="truncate text-sm font-semibold text-[#1d2922]">
-                        {bnbLoading ? 'Loading…' : bnbError ? 'Unavailable' : `${formatWalletBalance({ symbol: 'BNB' })} BNB`}
-                      </div>
-                    </div>
-                  </div>
-                  {allTokens.map(token => (
-                    <div key={token.address} className="flex min-w-0 items-center gap-2 rounded-xl border border-[#e3e9e5] bg-[#f5f7f6] p-3">
-                      <TokenIcon token={token} size={32} />
-                      <div className="min-w-0">
-                        <div className="text-xs text-[#65746b]">{token.symbol}</div>
-                        <div className="truncate text-sm font-semibold text-[#1d2922]">
-                          {balancesLoading ? 'Loading…' : balancesError ? 'Unavailable' : `${formatWalletBalance(token)} ${token.symbol}`}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </>
-            )}
-          </section>
-        )}
         {view === 'swap' && (
           <div className="grid lg:grid-cols-[1fr_440px] gap-6 items-start">
             <div className="order-2 lg:order-1 space-y-4">
@@ -926,7 +882,7 @@ export default function App() {
 
                 {connected && balancesError && (
                   <div className="mx-2 mb-2 rounded-2xl border border-[#ef4444]/30 bg-[#ef4444]/10 px-3 py-2 text-xs text-[#ef4444]">
-                    Unable to read balances from BSC right now. Check your RPC connection and retry.
+                    Some balances could not be read from BSC. Failed tokens show “Unavailable” rather than an incorrect zero.
                     <button onClick={refetchAll} className="ml-2 underline font-bold">Retry</button>
                   </div>
                 )}
@@ -938,8 +894,12 @@ export default function App() {
                       <span className="flex items-center gap-1">
                         {connected ? (
                           <>
-                            <span className={fromRealBalance.isReal ? 'text-[#13895c]' : 'text-[#65746b]'}>Real: {fromRealBalance.isReal ? parseFloat(fromRealBalance.formatted).toFixed(4) : '0.0000'} {fromToken.symbol}</span>
-                            <button onClick={() => setFromAmount(fromRealBalance.value.toString())} className="ml-1 bg-[#edf5f0] border border-[#13895c]/30 text-[#13895c] px-1.5 py-0.5 rounded-full text-[10px]">MAX</button>
+                            <span className={fromRealBalance.isReal ? 'text-[#13895c]' : 'text-[#65746b]'}>Balance: {formatWalletBalance(fromToken)}</span>
+                            <button
+                              disabled={!fromRealBalance.isReal}
+                              onClick={() => setFromAmount(fromRealBalance.formatted)}
+                              className="ml-1 bg-[#edf5f0] border border-[#13895c]/30 text-[#13895c] px-1.5 py-0.5 rounded-full text-[10px] disabled:opacity-50 disabled:cursor-not-allowed"
+                            >MAX</button>
                           </>
                         ) : '0.0'} {fromToken.symbol}
                       </span>
@@ -963,7 +923,7 @@ export default function App() {
                   <div className="bg-[#f5f7f6] rounded-2xl p-4 border border-transparent hover:border-[#e3e9e5] transition-colors">
                     <div className="flex justify-between text-xs text-[#65746b] mb-2">
                       <span>You receive</span>
-                      <span>Balance: {connected ? (toRealBalance.isReal ? parseFloat(toRealBalance.formatted).toFixed(4) : '0.0000') : '0.0'} {toToken.symbol} {toRealBalance.isReal && <span className="text-[#13895c]">• Real</span>}</span>
+                      <span>Balance: {connected ? formatWalletBalance(toToken) : '0.0'} {toToken.symbol}</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <input value={toAmount} readOnly placeholder="0.0" className="flex-1 bg-transparent text-[24px] font-medium outline-none placeholder:text-[#65746b]/50" />
@@ -1056,12 +1016,12 @@ export default function App() {
                       <div className="flex justify-between items-center"><h3 className="font-bold flex items-center gap-1"><Shield size={14} className="text-[#13895c]" /> Add Liquidity - Secured</h3><button onClick={() => setShowAddLiq(false)}><X size={18} /></button></div>
                       {!pairExists && <div className="bg-[#edf5f0] border border-[#13895c]/30 rounded-xl p-3 text-xs"><div className="font-bold text-[#13895c]">First provider! You set real price.</div><div className="text-[#65746b]">No price yet for {liqTokenA.symbol}/{liqTokenB.symbol} - you set it securely on-chain.</div></div>}
                       <div className="bg-[#ffffff] rounded-2xl p-4 border border-[#e3e9e5]">
-                        <div className="text-xs text-[#65746b] mb-2 flex justify-between"><span>Token A • Real: ${liqTokenA.price === 0 ? 'No price' : liqTokenA.price.toFixed(4)} • Sec: {getSecurityScore(liqTokenA).score}/100</span><span className="text-[#13895c]">Bal: {getBalanceForToken(liqTokenA).isReal ? parseFloat(getBalanceForToken(liqTokenA).formatted).toFixed(4) : '0'}</span></div>
+                        <div className="text-xs text-[#65746b] mb-2 flex justify-between"><span>Token A • Real: ${liqTokenA.price === 0 ? 'No price' : liqTokenA.price.toFixed(4)} • Sec: {getSecurityScore(liqTokenA).score}/100</span><span className="text-[#13895c]">Bal: {formatWalletBalance(liqTokenA)}</span></div>
                         <div className="flex gap-3"><input value={liqAmountA} onChange={e => handleLiqACalc(e.target.value)} placeholder="0.0" className="flex-1 bg-transparent text-xl outline-none" /><button onClick={() => setShowTokenSelect('liqA')} className="flex items-center gap-2 bg-[#f5f7f6] px-3 py-1.5 rounded-full border border-[#e3e9e5]"><TokenIcon token={liqTokenA} size={20} />{liqTokenA.symbol}<ChevronDown size={14} /></button></div>
                       </div>
                       <div className="flex justify-center -my-2"><div className="w-8 h-8 rounded-full bg-[#edf5f0] flex items-center justify-center border border-[#e3e9e5]"><Plus size={14} /></div></div>
                       <div className="bg-[#ffffff] rounded-2xl p-4 border border-[#e3e9e5]">
-                        <div className="text-xs text-[#65746b] mb-2 flex justify-between"><span>Token B • Real: ${liqTokenB.price === 0 ? 'No price' : liqTokenB.price.toFixed(4)} • Sec: {getSecurityScore(liqTokenB).score}/100</span><span className="text-[#13895c]">Bal: {getBalanceForToken(liqTokenB).isReal ? parseFloat(getBalanceForToken(liqTokenB).formatted).toFixed(4) : '0'}</span></div>
+                        <div className="text-xs text-[#65746b] mb-2 flex justify-between"><span>Token B • Real: ${liqTokenB.price === 0 ? 'No price' : liqTokenB.price.toFixed(4)} • Sec: {getSecurityScore(liqTokenB).score}/100</span><span className="text-[#13895c]">Bal: {formatWalletBalance(liqTokenB)}</span></div>
                         <div className="flex gap-3"><input value={liqAmountB} onChange={e => handleLiqBCalc(e.target.value)} placeholder="0.0" className="flex-1 bg-transparent text-xl outline-none" /><button onClick={() => setShowTokenSelect('liqB')} className="flex items-center gap-2 bg-[#f5f7f6] px-3 py-1.5 rounded-full border border-[#e3e9e5]"><TokenIcon token={liqTokenB} size={20} />{liqTokenB.symbol}<ChevronDown size={14} /></button></div>
                       </div>
                       <div className="bg-[#edf5f0]/50 border border-[#13895c]/20 rounded-xl p-2 text-[11px] text-[#65746b] flex items-center gap-1"><Lock size={10} className="text-[#13895c]" /> Secured: Non-custodial liquidity - you own LP tokens - no admin keys - audited</div>
@@ -1124,7 +1084,7 @@ export default function App() {
                       <div>
                         <div className="font-bold text-[15px] flex items-center gap-1.5">{token.symbol} {token.verified ? <ShieldCheck size={12} className="text-[#13895c]" /> : <span className="text-[9px] bg-[#ef4444]/20 text-[#ef4444] px-1 rounded">CUSTOM</span>} {token.official && <span className="text-[9px] bg-[#13895c] text-white px-1 rounded">OFFICIAL</span>} <span className={`text-[9px] px-1 rounded ${sec.level === 'safe' ? 'bg-[#13895c]/20 text-[#13895c]' : sec.level === 'medium' ? 'bg-[#eab308]/20 text-[#eab308]' : 'bg-[#ef4444]/20 text-[#ef4444]'}`}>{sec.score}/100</span></div>
                         <div className="text-xs text-[#65746b] flex items-center gap-1">{token.name} {token.official && <Lock size={10} className="text-[#13895c]" />}</div>
-                        {connected && <div className="text-[11px] text-[#13895c]">Real: {bal.isReal ? parseFloat(bal.formatted).toFixed(4) : '0'} {token.symbol} {bal.isReal ? '• On-chain' : '• No balance'}</div>}
+                        {connected && <div className="text-[11px] text-[#13895c]">Balance: {formatWalletBalance(token)} {token.symbol} {bal.isReal ? '• On-chain' : bal.isError ? '• Read failed' : ''}</div>}
                       </div>
                     </div>
                     <div className="text-right"><div className="text-xs text-[#65746b]">{token.price !== 0 ? `$${token.price < 1 ? token.price.toFixed(4) : token.price.toFixed(2)}` : 'No price'}</div><div className="text-[10px] text-[#65746b]">{bal.isReal && parseFloat(bal.formatted) > 0 ? `$${(parseFloat(bal.formatted) * token.price).toFixed(2)}` : sec.level}</div></div>

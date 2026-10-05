@@ -30,7 +30,7 @@ class ErrorBoundary extends React.Component {
             {'\n\n'}
             {this.state.error?.stack}
           </pre>
-          <button onClick={() => window.location.reload()} style={{ background: '#13895c', color: 'black', padding: '10px 20px', borderRadius: '12px', fontWeight: 'bold', marginTop: '12px', border: 'none', cursor: 'pointer' }}>Reload Securely</button>
+          <button onClick={() => window.location.reload()} style={{ background: '#13895c', color: 'white', padding: '10px 20px', borderRadius: '12px', fontWeight: 'bold', marginTop: '12px', border: 'none', cursor: 'pointer' }}>Reload Securely</button>
           <div style={{ marginTop: '20px', fontSize: '12px', color: '#65746b' }}>
             <div>Project ID: d7719d74fdd4d2ea309eb12d6eddb430 • BSC Mainnet • Reown AppKit</div>
           </div>

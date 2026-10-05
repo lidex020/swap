@@ -45,7 +45,7 @@ function TokenIcon({ token, size = 24 }) {
     <div className="relative flex-shrink-0" style={{ width: size, height: size }}>
       <img src={token.logo} alt={token.symbol} className="w-full h-full rounded-full object-cover bg-[#f5f7f6]" onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex' }} />
       <div style={{ display: 'none', width: size, height: size, background: token.color || '#13895c', borderRadius: '50%' }} className="items-center justify-center text-[10px] font-bold text-[#1d2922]">{token.symbol?.[0] || '?'}</div>
-      {token.verified && <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-[#13895c] rounded-full border border-[#f7f9f8] flex items-center justify-center"><CheckCircle size={8} className="text-black" /></div>}
+      {token.verified && <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-[#13895c] rounded-full border border-[#f7f9f8] flex items-center justify-center"><CheckCircle size={8} className="text-white" /></div>}
       {sec.level === 'high' && !token.verified && <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-[#ef4444] rounded-full border border-[#f7f9f8]" />}
     </div>
   )
@@ -78,6 +78,7 @@ export default function App() {
   const [lastPriceUpdate, setLastPriceUpdate] = useState(null)
   const [ldxRealData, setLdxRealData] = useState({ price: 0, listed: false, pairs: [], marketCap: 0 })
   const [showSecurityInfo, setShowSecurityInfo] = useState(false)
+  const [chartInterval, setChartInterval] = useState('24H')
   
   const [fromToken, setFromToken] = useState(INITIAL_TOKENS[0])
   const [toToken, setToToken] = useState(INITIAL_TOKENS[1])
@@ -623,11 +624,22 @@ export default function App() {
 
   const chartDataDynamic = useMemo(() => {
     const base = fromToken.price || 0.0085
-    return Array.from({ length: 48 }, (_, i) => ({
-      time: `${i}:00`,
-      price: base * (0.95 + Math.sin(i / 5) * 0.05 + Math.random() * 0.03),
-    }))
-  }, [fromToken.price])
+    const chartRanges = {
+      '24H': { points: 48, duration: 24 * 60 * 60 * 1000, cycles: 3, label: date => date.toLocaleTimeString([], { hour: 'numeric' }) },
+      '1W': { points: 56, duration: 7 * 24 * 60 * 60 * 1000, cycles: 4, label: date => date.toLocaleDateString([], { weekday: 'short' }) },
+      '1M': { points: 60, duration: 30 * 24 * 60 * 60 * 1000, cycles: 5, label: date => date.toLocaleDateString([], { month: 'short', day: 'numeric' }) },
+      '1Y': { points: 52, duration: 365 * 24 * 60 * 60 * 1000, cycles: 6, label: date => date.toLocaleDateString([], { month: 'short' }) },
+    }
+    const range = chartRanges[chartInterval]
+    const now = Date.now()
+    return Array.from({ length: range.points }, (_, i) => {
+      const progress = i / (range.points - 1)
+      const date = new Date(now - range.duration * (1 - progress))
+      const movement = Math.sin(progress * Math.PI * 2 * range.cycles) * 0.04
+        + Math.cos(progress * Math.PI * range.cycles) * 0.015
+      return { time: range.label(date), price: base * (1 + movement) }
+    })
+  }, [fromToken.price, chartInterval])
 
   return (
     <div className="min-h-screen bg-[#f7f9f8] text-[#1d2922] selection:bg-[#13895c]/30">
@@ -668,11 +680,11 @@ export default function App() {
                 {balancesLoading && <RefreshCw size={10} className="animate-spin" />}
               </div>
             )}
-            <button onClick={() => appKit.open()} className={`h-8 px-4 rounded-2xl font-semibold text-[15px] transition-all flex items-center gap-2 ${connected ? 'bg-[#ffffff] border border-[#e3e9e5] text-[#1d2922] hover:bg-[#edf5f0]' : 'bg-[#13895c] text-black hover:bg-[#0e7049] shadow-[0_0_15px_rgba(19,137,92,0.5)]'}`}>
+            <button onClick={() => appKit.open()} className={`h-8 px-4 rounded-2xl font-semibold text-[15px] transition-all flex items-center gap-2 ${connected ? 'bg-[#ffffff] border border-[#e3e9e5] text-[#1d2922] hover:bg-[#edf5f0]' : 'bg-[#13895c] text-white hover:bg-[#0e7049] shadow-[0_0_15px_rgba(19,137,92,0.5)]'}`}>
               {connected ? <><div className="w-2 h-2 bg-[#13895c] rounded-full animate-pulse" />{walletAddress} <span className="hidden sm:inline">• {chainId === 56 ? 'BSC' : chainId === 97 ? 'BSC Testnet' : chainId}</span></> : 'Connect Wallet'}
             </button>
             {connected && (
-              <button onClick={() => disconnect()} className="hidden md:flex w-8 h-8 rounded-full bg-[#1a1a1a] border border-[#2a2a2a] items-center justify-center text-[#65746b] hover:text-[#1d2922]" title="Disconnect securely">
+              <button onClick={() => disconnect()} className="hidden md:flex w-8 h-8 rounded-full bg-white border border-[#e3e9e5] items-center justify-center text-[#65746b] hover:text-[#1d2922]" title="Disconnect securely">
                 <X size={14} />
               </button>
             )}
@@ -685,7 +697,7 @@ export default function App() {
             {connected && (
               <>
                 <div className="bg-[#ffffff] border border-[#13895c]/20 rounded-xl p-3">
-                  <div className="flex items-center justify-between"><div className="text-sm font-bold">{walletAddress}</div><span className="text-[10px] bg-[#13895c] text-black px-1.5 py-0.5 rounded-full">SECURE</span></div>
+                  <div className="flex items-center justify-between"><div className="text-sm font-bold">{walletAddress}</div><span className="text-[10px] bg-[#13895c] text-white px-1.5 py-0.5 rounded-full">SECURE</span></div>
                   <div className="text-xs text-[#65746b] mt-1">{fullAddress}</div>
                   <div className="text-xs text-[#13895c] mt-1">{bnbBalance ? `${parseFloat(bnbBalance.formatted).toFixed(4)} BNB` : 'BSC'} • {chainId === 56 ? 'BSC Mainnet' : `Chain ${chainId}`} • Reown AppKit</div>
                 </div>
@@ -698,9 +710,9 @@ export default function App() {
             <button onClick={() => { setView('liquidity'); setMobileMenu(false) }} className="text-left px-4 py-3 rounded-xl bg-[#ffffff] border border-[#e3e9e5]">Liquidity</button>
             <button onClick={() => { setShowListTokenModal(true); setMobileMenu(false) }} className="text-left px-4 py-3 rounded-xl bg-[#edf5f0] border border-[#13895c]/30 text-[#13895c]">+ List Your Token</button>
             {!connected ? (
-              <button onClick={() => { appKit.open(); setMobileMenu(false) }} className="text-left px-4 py-3 rounded-xl bg-[#13895c] text-black font-bold">Connect Wallet</button>
+              <button onClick={() => { appKit.open(); setMobileMenu(false) }} className="text-left px-4 py-3 rounded-xl bg-[#13895c] text-white font-bold">Connect Wallet</button>
             ) : (
-              <button onClick={() => { disconnect(); setMobileMenu(false) }} className="text-left px-4 py-3 rounded-xl bg-[#1a1a1a] border border-[#2a2a2a] text-[#ef4444]">Disconnect - Secure logout</button>
+              <button onClick={() => { disconnect(); setMobileMenu(false) }} className="text-left px-4 py-3 rounded-xl bg-white border border-[#e3e9e5] text-[#ef4444]">Disconnect - Secure logout</button>
             )}
           </div>
         )}
@@ -767,7 +779,7 @@ export default function App() {
             {chainId !== BALANCE_CHAIN_ID ? (
               <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#ef4444]/30 bg-[#ef4444]/10 p-3 text-sm">
                 <span className="text-[#1d2922]">Switch to BNB Smart Chain to load on-chain token balances.</span>
-                <button onClick={() => switchChain({ chainId: bsc.id })} className="rounded-full bg-[#13895c] px-3 py-1.5 text-xs font-bold text-black">
+                <button onClick={() => switchChain({ chainId: bsc.id })} className="rounded-full bg-[#13895c] px-3 py-1.5 text-xs font-bold text-white">
                   Switch to BSC
                 </button>
               </div>
@@ -828,7 +840,13 @@ export default function App() {
                   </div>
                   <div className="flex gap-1 bg-[#f5f7f6] rounded-xl p-1 border border-[#e3e9e5]">
                     {['24H', '1W', '1M', '1Y'].map(t => (
-                      <button key={t} className={`px-3 py-1 rounded-lg text-sm font-medium ${t === '24H' ? 'bg-[#edf5f0] text-[#1d2922] border border-[#13895c]/30' : 'text-[#65746b]'}`}>{t}</button>
+                      <button
+                        key={t}
+                        type="button"
+                        aria-pressed={chartInterval === t}
+                        onClick={() => setChartInterval(t)}
+                        className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${chartInterval === t ? 'bg-[#13895c] text-white border border-[#13895c]' : 'text-[#65746b] hover:bg-white'}`}
+                      >{t}</button>
                     ))}
                   </div>
                 </div>
@@ -852,7 +870,7 @@ export default function App() {
                           <stop offset="95%" stopColor="#13895c" stopOpacity={0} />
                         </linearGradient>
                       </defs>
-                      <XAxis dataKey="time" hide />
+                      <XAxis dataKey="time" tick={{ fill: '#65746b', fontSize: 11 }} tickLine={false} axisLine={false} minTickGap={24} />
                       <YAxis domain={['auto', 'auto']} hide />
                       <Tooltip contentStyle={{ background: '#ffffff', border: '1px solid #e3e9e5', borderRadius: '12px', color: 'white' }} formatter={(v) => [`$${Number(v).toFixed(6)}`, 'Real Price']} />
                       <Area type="monotone" dataKey="price" stroke={fromToken.price === 0 ? '#ef4444' : '#13895c'} strokeWidth={2.5} fill="url(#priceGrad)" />
@@ -900,7 +918,7 @@ export default function App() {
                   <div className="mx-2 mb-2 bg-[#f5f7f6] border border-[#13895c]/20 rounded-2xl p-2.5 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <div className="w-7 h-7 rounded-full bg-[#13895c]/20 border border-[#13895c]/30 flex items-center justify-center"><Wallet size={12} className="text-[#13895c]" /></div>
-                      <div className="text-xs font-bold text-[#1d2922] flex items-center gap-1.5">{walletAddress} <span className="text-[9px] bg-[#13895c] text-black px-1.5 py-0.5 rounded-full flex items-center gap-1"><ShieldCheck size={8} /> Secure</span><span className="text-[10px] text-[#65746b] font-normal">{chainId === 56 ? 'BSC' : `Chain ${chainId}`}</span></div>
+                      <div className="text-xs font-bold text-[#1d2922] flex items-center gap-1.5">{walletAddress} <span className="text-[9px] bg-[#13895c] text-white px-1.5 py-0.5 rounded-full flex items-center gap-1"><ShieldCheck size={8} /> Secure</span><span className="text-[10px] text-[#65746b] font-normal">{chainId === 56 ? 'BSC' : `Chain ${chainId}`}</span></div>
                     </div>
                     <button onClick={() => appKit.open()} className="text-[11px] bg-[#ffffff] border border-[#e3e9e5] hover:bg-[#edf5f0] text-[#65746b] hover:text-[#1d2922] px-3 py-1 rounded-full">Manage</button>
                   </div>
@@ -997,7 +1015,7 @@ export default function App() {
                   {connected && chainId === BALANCE_CHAIN_ID && quoteError && !sameSwapToken && (
                     <div className="mb-2 rounded-2xl border border-[#eab308]/30 bg-[#eab308]/10 px-3 py-2 text-xs text-[#eab308]">No LidexSwap pool quote is available for this token pair and amount.</div>
                   )}
-                  <button onClick={handleSwap} disabled={isSwapping || (!fromAmount && connected) || !isValidAddress(ROUTER_ADDRESS) || (connected && chainId === BALANCE_CHAIN_ID && (!parsedSwapAmount || !hasKnownInputBalance || insufficientInputBalance || sameSwapToken || !quotedOutput || inputAllowance === undefined)) || (connected && !swapValidation.valid && !swapValidation.isWarning)} className={`w-full h-[48px] rounded-2xl font-bold text-[16px] transition-all flex items-center justify-center gap-2 ${!connected ? 'bg-[#13895c] hover:bg-[#0e7049] text-black shadow-[0_4px_15px_rgba(19,137,92,0.4)]' : !fromAmount || !quotedOutput || sameSwapToken ? 'bg-[#edf5f0] text-[#65746b] cursor-not-allowed border border-[#e3e9e5]' : priceImpactRisk.level === 'critical' ? 'bg-[#ef4444] text-[#1d2922]' : 'bg-[#13895c] hover:bg-[#0e7049] text-black shadow-[0_4px_15px_rgba(19,137,92,0.4)]'}`}>
+                  <button onClick={handleSwap} disabled={isSwapping || (!fromAmount && connected) || !isValidAddress(ROUTER_ADDRESS) || (connected && chainId === BALANCE_CHAIN_ID && (!parsedSwapAmount || !hasKnownInputBalance || insufficientInputBalance || sameSwapToken || !quotedOutput || inputAllowance === undefined)) || (connected && !swapValidation.valid && !swapValidation.isWarning)} className={`w-full h-[48px] rounded-2xl font-bold text-[16px] transition-all flex items-center justify-center gap-2 ${!connected ? 'bg-[#13895c] hover:bg-[#0e7049] text-white shadow-[0_4px_15px_rgba(19,137,92,0.4)]' : !fromAmount || !quotedOutput || sameSwapToken ? 'bg-[#edf5f0] text-[#65746b] cursor-not-allowed border border-[#e3e9e5]' : priceImpactRisk.level === 'critical' ? 'bg-[#ef4444] text-white' : 'bg-[#13895c] hover:bg-[#0e7049] text-white shadow-[0_4px_15px_rgba(19,137,92,0.4)]'}`}>
                     {isSwapping && <RefreshCw size={16} className="animate-spin" />}
                     {!isSwapping && !connected && <ShieldCheck size={16} />}
                     {!isSwapping && connected && chainId === BALANCE_CHAIN_ID && !needsApproval && quotedOutput && <Lock size={16} />}
@@ -1028,11 +1046,11 @@ export default function App() {
                   <ShieldCheck size={32} className="mx-auto text-[#13895c] mb-3" />
                   <div className="text-[#65746b] mb-2">Connect wallet securely via Reown AppKit to see real balances</div>
                   <div className="text-xs text-[#65746b] mb-3">Non-custodial • Encrypted • 300+ wallets • BSC Mainnet • Real on-chain balances</div>
-                  <button onClick={() => appKit.open()} className="bg-[#13895c] text-black px-6 py-2.5 rounded-2xl font-bold flex items-center gap-2 mx-auto"><Lock size={14} /> Connect Wallet - Secure</button>
+                  <button onClick={() => appKit.open()} className="bg-[#13895c] text-white px-6 py-2.5 rounded-2xl font-bold flex items-center gap-2 mx-auto"><Lock size={14} /> Connect Wallet - Secure</button>
                 </div>
               ) : (
                 <>
-                  <div className="flex justify-between items-center mb-4"><span className="text-[#65746b]">{liquidityPositions.length} positions • {connected ? `${walletAddress}` : 'Not connected'}</span><button onClick={() => setShowAddLiq(true)} className="bg-[#13895c] text-black px-4 py-1.5 rounded-full text-sm font-bold flex items-center gap-1"><Plus size={14} /> Add Liquidity</button></div>
+                  <div className="flex justify-between items-center mb-4"><span className="text-[#65746b]">{liquidityPositions.length} positions • {connected ? `${walletAddress}` : 'Not connected'}</span><button onClick={() => setShowAddLiq(true)} className="bg-[#13895c] text-white px-4 py-1.5 rounded-full text-sm font-bold flex items-center gap-1"><Plus size={14} /> Add Liquidity</button></div>
                   {showAddLiq ? (
                     <div className="bg-[#f5f7f6] rounded-2xl p-4 space-y-3 border border-[#13895c]/30">
                       <div className="flex justify-between items-center"><h3 className="font-bold flex items-center gap-1"><Shield size={14} className="text-[#13895c]" /> Add Liquidity - Secured</h3><button onClick={() => setShowAddLiq(false)}><X size={18} /></button></div>
@@ -1047,12 +1065,12 @@ export default function App() {
                         <div className="flex gap-3"><input value={liqAmountB} onChange={e => handleLiqBCalc(e.target.value)} placeholder="0.0" className="flex-1 bg-transparent text-xl outline-none" /><button onClick={() => setShowTokenSelect('liqB')} className="flex items-center gap-2 bg-[#f5f7f6] px-3 py-1.5 rounded-full border border-[#e3e9e5]"><TokenIcon token={liqTokenB} size={20} />{liqTokenB.symbol}<ChevronDown size={14} /></button></div>
                       </div>
                       <div className="bg-[#edf5f0]/50 border border-[#13895c]/20 rounded-xl p-2 text-[11px] text-[#65746b] flex items-center gap-1"><Lock size={10} className="text-[#13895c]" /> Secured: Non-custodial liquidity - you own LP tokens - no admin keys - audited</div>
-                      <button onClick={handleAddLiquidity} className="w-full h-12 rounded-2xl bg-[#13895c] text-black font-bold flex items-center justify-center gap-2"><ShieldCheck size={16} /> Add Liquidity Securely - BSC</button>
+                      <button onClick={handleAddLiquidity} className="w-full h-12 rounded-2xl bg-[#13895c] text-white font-bold flex items-center justify-center gap-2"><ShieldCheck size={16} /> Add Liquidity Securely - BSC</button>
                     </div>
                   ) : (
                     <div className="text-center py-12 bg-[#f5f7f6] rounded-2xl border border-dashed border-[#e3e9e5]">
                       <div className="text-xs text-[#65746b] mb-4">{walletAddress} • {bnbBalance ? `${parseFloat(bnbBalance.formatted).toFixed(4)} BNB` : 'BSC'} • Secured via Reown</div>
-                      <button onClick={() => setShowAddLiq(true)} className="bg-[#13895c] text-black px-4 py-2 rounded-full text-sm font-bold">Add Liquidity - Set Real Price</button>
+                      <button onClick={() => setShowAddLiq(true)} className="bg-[#13895c] text-white px-4 py-2 rounded-full text-sm font-bold">Add Liquidity - Set Real Price</button>
                     </div>
                   )}
                 </>
@@ -1087,7 +1105,7 @@ export default function App() {
                   <div className="text-sm font-bold text-[#13895c] flex items-center gap-1"><AlertTriangle size={14} /> Import custom - Security Check Required</div>
                   <div className="text-xs truncate font-mono">{searchQuery}</div>
                   <div className="text-[11px] text-[#65746b] mt-1">⚠️ Unverified token - high risk. Only import if you trust source. Check BscScan.</div>
-                  <button onClick={() => handleImportToken()} className="mt-2 w-full bg-[#13895c] text-black rounded-full py-2 text-sm font-bold">Import with Security Warning</button>
+                  <button onClick={() => handleImportToken()} className="mt-2 w-full bg-[#13895c] text-white rounded-full py-2 text-sm font-bold">Import with Security Warning</button>
                 </div>
               )}
               {filteredTokens.map(token => {
@@ -1104,7 +1122,7 @@ export default function App() {
                     <div className="flex items-center gap-3">
                       <TokenIcon token={token} size={32} />
                       <div>
-                        <div className="font-bold text-[15px] flex items-center gap-1.5">{token.symbol} {token.verified ? <ShieldCheck size={12} className="text-[#13895c]" /> : <span className="text-[9px] bg-[#ef4444]/20 text-[#ef4444] px-1 rounded">CUSTOM</span>} {token.official && <span className="text-[9px] bg-[#13895c] text-black px-1 rounded">OFFICIAL</span>} <span className={`text-[9px] px-1 rounded ${sec.level === 'safe' ? 'bg-[#13895c]/20 text-[#13895c]' : sec.level === 'medium' ? 'bg-[#eab308]/20 text-[#eab308]' : 'bg-[#ef4444]/20 text-[#ef4444]'}`}>{sec.score}/100</span></div>
+                        <div className="font-bold text-[15px] flex items-center gap-1.5">{token.symbol} {token.verified ? <ShieldCheck size={12} className="text-[#13895c]" /> : <span className="text-[9px] bg-[#ef4444]/20 text-[#ef4444] px-1 rounded">CUSTOM</span>} {token.official && <span className="text-[9px] bg-[#13895c] text-white px-1 rounded">OFFICIAL</span>} <span className={`text-[9px] px-1 rounded ${sec.level === 'safe' ? 'bg-[#13895c]/20 text-[#13895c]' : sec.level === 'medium' ? 'bg-[#eab308]/20 text-[#eab308]' : 'bg-[#ef4444]/20 text-[#ef4444]'}`}>{sec.score}/100</span></div>
                         <div className="text-xs text-[#65746b] flex items-center gap-1">{token.name} {token.official && <Lock size={10} className="text-[#13895c]" />}</div>
                         {connected && <div className="text-[11px] text-[#13895c]">Real: {bal.isReal ? parseFloat(bal.formatted).toFixed(4) : '0'} {token.symbol} {bal.isReal ? '• On-chain' : '• No balance'}</div>}
                       </div>
@@ -1144,7 +1162,7 @@ export default function App() {
             </div>
             <input value={newTokenAddress} onChange={e => setNewTokenAddress(sanitizeAddress(e.target.value))} placeholder="0x... any BEP-20 - secured validation" className="w-full bg-[#f5f7f6] border border-[#e3e9e5] rounded-2xl px-4 py-3 outline-none text-sm font-mono" />
             <div className="mt-2 text-[10px] text-[#65746b]">Security: Address sanitized • Validated • No phishing • Official LDX check</div>
-            <button onClick={handleListTokenDirect} disabled={!isValidAddress(newTokenAddress)} className={`mt-3 w-full h-12 rounded-2xl font-bold flex items-center justify-center gap-2 ${isValidAddress(newTokenAddress) ? 'bg-[#13895c] text-black' : 'bg-[#edf5f0] text-[#65746b] cursor-not-allowed border border-[#e3e9e5]'}`}><ShieldCheck size={16} /> Import & List Securely</button>
+            <button onClick={handleListTokenDirect} disabled={!isValidAddress(newTokenAddress)} className={`mt-3 w-full h-12 rounded-2xl font-bold flex items-center justify-center gap-2 ${isValidAddress(newTokenAddress) ? 'bg-[#13895c] text-white' : 'bg-[#edf5f0] text-[#65746b] cursor-not-allowed border border-[#e3e9e5]'}`}><ShieldCheck size={16} /> Import & List Securely</button>
           </div>
         </div>
       )}

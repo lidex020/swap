@@ -880,13 +880,6 @@ export default function App() {
                   </div>
                 )}
 
-                {connected && balancesError && (
-                  <div className="mx-2 mb-2 rounded-2xl border border-[#ef4444]/30 bg-[#ef4444]/10 px-3 py-2 text-xs text-[#ef4444]">
-                    Some balances could not be read from BSC. Failed tokens show “Unavailable” rather than an incorrect zero.
-                    <button onClick={refetchAll} className="ml-2 underline font-bold">Retry</button>
-                  </div>
-                )}
-
                 <div className="p-2 space-y-1">
                   <div className="bg-[#f5f7f6] rounded-2xl p-4 border border-transparent hover:border-[#e3e9e5] transition-colors">
                     <div className="flex justify-between text-xs text-[#65746b] mb-2">
